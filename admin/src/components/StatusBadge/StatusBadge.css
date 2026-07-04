@@ -1,0 +1,48 @@
+.status-label {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-xs);
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.status-label--pending {
+    color: var(--color-warning-text);
+    background: var(--color-warning-bg);
+}
+
+.status-label--published,
+.status-label--active,
+.status-label--paid {
+    color: var(--color-success);
+    background: rgba(22, 163, 74, 0.12);
+}
+
+.status-label--rejected,
+.status-label--blocked {
+    color: var(--color-danger);
+    background: rgba(220, 38, 38, 0.12);
+}
+
+.status-label--expired,
+.status-label--waiting {
+    color: var(--color-muted);
+    background: rgba(107, 114, 128, 0.12);
+}
+
+.status-label--new {
+    color: var(--color-warning-text);
+    background: var(--color-warning-bg);
+}
+
+.status-label--processing {
+    color: var(--color-primary);
+    background: var(--color-soft-bg);
+}
+
+.status-label--resolved {
+    color: var(--color-success);
+    background: rgba(22, 163, 74, 0.12);
+}

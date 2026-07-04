@@ -1,0 +1,249 @@
+.route-page {
+    min-height: 100vh;
+    padding: 32px;
+
+    background:
+        radial-gradient(circle at top left, rgba(214, 167, 95, 0.16), transparent 32%),
+        var(--color-bg);
+}
+
+.route-page__card {
+    width: min(1180px, 100%);
+    margin: 0 auto;
+    padding: 28px;
+
+    border: 1px solid var(--border-soft);
+    border-radius: 28px;
+
+    background: var(--color-surface);
+    color: var(--color-text);
+
+    box-shadow: var(--shadow-soft);
+}
+
+.route-page__back {
+    display: inline-flex;
+    margin-bottom: 22px;
+
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.route-page__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+
+    margin-bottom: 28px;
+}
+
+.route-page__eyebrow {
+    margin: 0 0 8px;
+
+    color: var(--color-gold);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.route-page__header h1 {
+    margin: 0;
+
+    font-size: clamp(32px, 5vw, 56px);
+    line-height: 1;
+}
+
+.route-page__description {
+    max-width: 680px;
+    margin: 14px 0 0;
+
+    color: var(--color-text-muted);
+    line-height: 1.6;
+}
+
+.route-page__button,
+.route-page__small-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 0;
+    border-radius: 999px;
+
+    background: linear-gradient(
+        135deg,
+        var(--color-gold),
+        var(--color-gold-light)
+    );
+
+    color: var(--color-bg);
+    text-decoration: none;
+
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.route-page__button {
+    min-height: 46px;
+    padding: 0 20px;
+    white-space: nowrap;
+}
+
+.route-page__small-button {
+    min-height: 36px;
+    padding: 0 14px;
+    font-size: 13px;
+}
+
+.route-page__small-button--danger {
+    background: rgba(220, 38, 38, 0.18);
+    color: #fecaca;
+}
+
+.route-page__empty {
+    padding: 28px;
+
+    border: 1px solid var(--border-soft);
+    border-radius: 22px;
+
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.route-page__empty h2 {
+    margin: 0;
+}
+
+.route-page__empty p {
+    color: var(--color-text-muted);
+}
+
+.route-page__places {
+    display: grid;
+    gap: 16px;
+}
+
+.route-page__place {
+    display: grid;
+    grid-template-columns: 48px 170px 1fr;
+    gap: 16px;
+    align-items: stretch;
+
+    padding: 14px;
+
+    border: 1px solid var(--border-soft);
+    border-radius: 22px;
+
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.route-page__place-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 42px;
+    height: 42px;
+
+    border-radius: 50%;
+
+    background: var(--color-gold);
+    color: var(--color-bg);
+
+    font-weight: 900;
+}
+
+.route-page__place-image {
+    width: 170px;
+    height: 120px;
+
+    border-radius: 18px;
+
+    object-fit: cover;
+}
+
+.route-page__place-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.route-page__place-content p {
+    margin: 0 0 5px;
+
+    color: var(--color-gold);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.route-page__place-content h2 {
+    margin: 0;
+
+    font-size: 24px;
+}
+
+.route-page__place-content span {
+    margin-top: 8px;
+
+    color: var(--color-text-muted);
+    line-height: 1.45;
+}
+
+.route-page__place-content strong {
+    margin-top: 8px;
+
+    color: var(--color-text);
+}
+
+.route-page__place-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    margin-top: 14px;
+}
+
+.route-page__header-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+.route-page__button--secondary {
+    background: rgba(255,255,255,0.08);
+    color: var(--color-text);
+}
+
+.route-page__share-message {
+    font-size: 13px;
+    color: var(--color-gold);
+    font-weight: 700;
+}
+
+@media (max-width: 760px) {
+    .route-page {
+        padding: 16px;
+    }
+
+    .route-page__card {
+        padding: 20px;
+        border-radius: 22px;
+    }
+
+    .route-page__header {
+        display: grid;
+    }
+
+    .route-page__place {
+        grid-template-columns: 1fr;
+    }
+
+    .route-page__place-image {
+        width: 100%;
+        height: 180px;
+    }
+}

@@ -1,0 +1,360 @@
+.account-page {
+    position: relative;
+    min-height: 100svh;
+    overflow: hidden;
+    color: rgba(255, 248, 232, 0.94);
+
+    background:
+        linear-gradient(rgba(3, 7, 14, 0.42), rgba(3, 7, 14, 0.88)),
+        radial-gradient(circle at 72% 12%, rgba(255, 181, 79, 0.2), transparent 28%),
+        url("/images/account/account-bg.webp") center / cover no-repeat;
+}
+
+.account-page::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 72% 18%, rgba(255, 180, 78, 0.18), transparent 32%),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.52), transparent 42%, rgba(0, 0, 0, 0.35));
+    z-index: 0;
+}
+
+.account-page::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.18;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 3px 3px;
+    mix-blend-mode: overlay;
+    z-index: 1;
+}
+
+.account-page__hero {
+    position: relative;
+    z-index: 2;
+    height: 100svh;
+    padding: 28px clamp(18px, 4vw, 64px);
+    overflow: hidden;
+}
+
+.account-page__back {
+    display: inline-flex;
+    margin-bottom: 34px;
+    color: rgba(255, 248, 232, 0.72);
+    text-decoration: none;
+}
+
+.account-page__back:hover {
+    color: rgba(255, 248, 232, 0.96);
+}
+
+.account-page__eyebrow {
+    margin: 0 0 14px;
+    text-align: center;
+    color: var(--color-gold-light);
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-shadow: 0 4px 28px rgba(0, 0, 0, 0.55);
+}
+
+.account-page h1 {
+    max-width: 860px;
+    margin: 0 auto;
+    text-align: center;
+    font-size: clamp(24px, 4vw, 54px);
+    line-height: 0.96;
+    letter-spacing: -0.055em;
+    text-shadow: 0 8px 34px rgba(0, 0, 0, 0.65);
+}
+
+.account-page__grid {
+    width: min(920px, 100%);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+    margin: 52px auto 0;
+}
+
+.account-card {
+    min-height: 230px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 34px;
+    text-align: center;
+
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+
+    border-radius: 32px;
+    border: 1px solid rgba(255, 248, 232, 0.16);
+
+    background:
+        radial-gradient(circle at 50% 0%, rgba(244, 213, 141, 0.14), transparent 42%),
+        linear-gradient(180deg, rgba(12, 10, 8, 0.64), rgba(8, 8, 10, 0.42));
+
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 22px 70px rgba(0, 0, 0, 0.28);
+
+    transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.25s ease;
+}
+
+.account-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(244, 213, 141, 0.34);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.12),
+        0 30px 90px rgba(0, 0, 0, 0.38);
+}
+
+.account-card h2 {
+    margin: 0;
+    font-size: 30px;
+    line-height: 1.1;
+    text-shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
+}
+
+.account-card p {
+    max-width: 280px;
+    margin: 18px 0 0;
+    color: rgba(255, 248, 232, 0.68);
+    line-height: 1.6;
+}
+
+.account-empty {
+    width: min(720px, 100%);
+    margin: 52px auto 0;
+    padding: 34px;
+    text-align: center;
+
+    border-radius: 32px;
+    border: 1px solid rgba(255, 248, 232, 0.16);
+
+    background:
+        radial-gradient(circle at 50% 0%, rgba(244, 213, 141, 0.14), transparent 42%),
+        linear-gradient(180deg, rgba(12, 10, 8, 0.64), rgba(8, 8, 10, 0.42));
+
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+}
+
+.account-empty h2 {
+    margin: 0;
+    font-size: 30px;
+}
+
+.account-empty p {
+    max-width: 520px;
+    margin: 16px auto 0;
+    color: rgba(255, 248, 232, 0.68);
+    line-height: 1.6;
+}
+
+.account-empty__button {
+    display: inline-flex;
+    margin-top: 26px;
+    padding: 14px 22px;
+
+    border-radius: 999px;
+    background: rgba(244, 213, 141, 0.18);
+    color: rgba(255, 248, 232, 0.94);
+    text-decoration: none;
+    font-weight: 800;
+
+    border: 1px solid rgba(244, 213, 141, 0.32);
+}
+
+.account-places {
+    width: min(980px, 100%);
+    display: grid;
+    gap: 18px;
+    margin: 52px auto 0;
+}
+
+.account-place-card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+
+    padding: 26px;
+    border-radius: 28px;
+    border: 1px solid rgba(255, 248, 232, 0.16);
+
+    background:
+        radial-gradient(circle at 20% 0%, rgba(244, 213, 141, 0.14), transparent 38%),
+        linear-gradient(180deg, rgba(12, 10, 8, 0.66), rgba(8, 8, 10, 0.44));
+
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+
+    box-shadow: 0 22px 70px rgba(0, 0, 0, 0.26);
+}
+
+.account-place-card__category {
+    display: inline-flex;
+    margin-bottom: 12px;
+    color: var(--color-gold-light);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.account-place-card h2 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.account-place-card p {
+    max-width: 640px;
+    margin: 14px 0 0;
+    color: rgba(255, 248, 232, 0.68);
+    line-height: 1.6;
+}
+
+.account-place-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+    color: rgba(255, 248, 232, 0.54);
+    font-size: 14px;
+}
+
+.account-place-card__meta span {
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(255, 248, 232, 0.08);
+}
+
+.account-place-card__actions {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
+}
+
+.account-place-card__button {
+    min-width: 120px;
+    padding: 12px 16px;
+
+    border: 1px solid rgba(244, 213, 141, 0.28);
+    border-radius: 999px;
+
+    background: rgba(244, 213, 141, 0.14);
+    color: rgba(255, 248, 232, 0.94);
+
+    text-align: center;
+    text-decoration: none;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.account-place-card__button--danger {
+    border-color: rgba(255, 120, 98, 0.28);
+    background: rgba(255, 120, 98, 0.12);
+}
+
+.account-page__logout {
+    position: absolute;
+
+    top: 28px;
+    right: 48px;
+
+    color: rgba(255, 255, 255, 0.75);
+
+    font-size: 18px;
+    text-decoration: none;
+
+    transition: opacity 0.2s ease;
+}
+
+.account-page__logout:hover {
+    opacity: 1;
+}
+
+.account-page__loading {
+    margin: 0;
+
+    color: rgba(255, 255, 255, 0.78);
+
+    font-size: 18px;
+}
+
+@media (max-width: 980px) {
+    .account-page {
+        min-height: 100dvh;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .account-page__hero {
+        height: auto;
+        min-height: 100dvh;
+        overflow: visible;
+    }
+
+    .account-book {
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+        aspect-ratio: auto;
+    }
+}
+
+@media (max-width: 900px) {
+    .account-page__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .account-page h1 {
+        font-size: clamp(34px, 11vw, 54px);
+    }
+}
+
+@media (max-width: 720px) {
+    .account-place-card {
+        grid-template-columns: 1fr;
+    }
+
+    .account-place-card__actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 560px) {
+    .account-page__hero {
+        padding: 22px;
+        height: auto;
+        overflow: visible;
+    }
+
+    .account-card {
+        min-height: 190px;
+        padding: 26px;
+        border-radius: 26px;
+    }
+}

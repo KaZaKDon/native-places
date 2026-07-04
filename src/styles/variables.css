@@ -1,0 +1,36 @@
+:root {
+    --color-bg: #0f172a;
+    --color-bg-deep: #070b12;
+    --color-bg-deep-rgb: 7, 11, 18;
+    --color-surface: rgba(15, 23, 42, 0.72);
+
+    --color-text: #f8fafc;
+    --color-text-muted: #cbd5e1;
+    --color-text-soft: #94a3b8;
+
+    --color-gold: #d6a75f;
+    --color-gold-rgb: 214, 167, 95;
+    --color-gold-light: #f0d89c;
+    --color-gold-light-rgb: 240, 216, 156;
+    --color-paper: #fff4df;
+    --color-paper-deep: #f7dfb7;
+    --color-water: #14b8a6;
+    --color-nature: #7c8f5b;
+
+    --border-soft: rgba(255, 255, 255, 0.16);
+    --shadow-soft: 0 24px 80px rgba(0, 0, 0, 0.45);
+
+    --container: 1440px;
+
+    --tooltip-color-nature: #A8C17E;
+
+    --tooltip-color-fishing: #4FD1C5;
+
+    --tooltip-color-hunting: #C08A64;
+
+    --tooltip-color-real-estate: #E8C27A;
+
+    --tooltip-color-rent: #8ED8FF;
+
+    --tooltip-color-recreation: #D5A6FF;
+}

@@ -1,0 +1,29 @@
+.dashboard-list {
+    display: grid;
+}
+
+.dashboard-list-item {
+    display: grid;
+    gap: var(--space-xxs);
+    padding: var(--space-lg) var(--space-xl);
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text);
+}
+
+.dashboard-list-item:last-child {
+    border-bottom: 0;
+}
+
+.dashboard-list-item strong {
+    font-size: var(--font-size-md);
+}
+
+.dashboard-list-item span {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.dashboard-list-empty {
+    padding: var(--space-xl);
+    color: var(--color-text-secondary);
+}

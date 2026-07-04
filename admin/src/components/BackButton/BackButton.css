@@ -1,0 +1,14 @@
+.back-link {
+    padding: 0;
+    margin-bottom: var(--space-lg);
+    border: 0;
+    background: transparent;
+    color: var(--color-primary);
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+}
+
+.back-link:hover {
+    color: var(--color-text-secondary);
+}

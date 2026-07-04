@@ -1,0 +1,75 @@
+.account-route-card {
+    width: 100%;
+    max-width: 440px;
+    min-height: 350px;
+
+    display: flex;
+    flex-direction: column;
+
+    margin: 0 auto;
+    padding: 18px;
+
+    border: 1px solid rgba(96, 65, 34, 0.16);
+    border-radius: 24px;
+
+    background: rgba(255, 248, 232, 0.22);
+}
+
+.account-route-card__head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+
+    font-size: 12px;
+    font-weight: 800;
+    opacity: 0.78;
+}
+
+.account-route-card__head strong {
+    padding: 5px 9px;
+
+    border-radius: 999px;
+
+    background: rgba(96, 65, 34, 0.12);
+}
+
+.account-route-card h2 {
+    margin: 18px 0 0;
+
+    font-size: 22px;
+    line-height: 1.15;
+    text-transform: uppercase;
+}
+
+.account-route-card > p {
+    margin: 14px 0 0;
+
+    font-size: 15px;
+    line-height: 1.55;
+}
+
+.account-route-card__places {
+    display: grid;
+    gap: 8px;
+
+    margin-top: 16px;
+    padding: 12px;
+
+    border-radius: 18px;
+
+    background: rgba(96, 65, 34, 0.1);
+}
+
+.account-route-card__place {
+    font-size: 14px;
+    line-height: 1.35;
+}
+
+.account-route-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+
+    margin-top: auto;
+}

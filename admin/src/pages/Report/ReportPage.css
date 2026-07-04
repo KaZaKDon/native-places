@@ -1,0 +1,85 @@
+.report-page-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--space-xl);
+}
+
+.report-page-main,
+.report-page-aside {
+    display: grid;
+    align-content: start;
+    gap: var(--space-xl);
+}
+
+.report-section {
+    padding: var(--space-xl);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+}
+
+.report-section h3 {
+    margin-top: 0;
+}
+
+.report-section p {
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+}
+
+.report-links {
+    display: grid;
+    gap: var(--space-md);
+}
+
+.report-links a {
+    color: var(--color-primary);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.report-links a:hover {
+    text-decoration: underline;
+}
+
+.report-info-list {
+    display: grid;
+    gap: var(--space-md);
+}
+
+.report-info-list span {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.report-info-list strong {
+    display: block;
+}
+
+.report-actions {
+    display: grid;
+    gap: var(--space-md);
+}
+
+.report-actions button {
+    height: 42px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.report-actions button:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+@media (max-width: 980px) {
+    .report-page-grid {
+        grid-template-columns: 1fr;
+    }
+}

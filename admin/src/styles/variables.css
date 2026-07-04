@@ -1,0 +1,34 @@
+:root {
+    --font-main: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+    --font-size-xs: 12px;
+    --font-size-sm: 13px;
+    --font-size-md: 14px;
+    --font-size-title: 24px;
+    --font-size-subtitle: 22px;
+    --font-size-page-title: 30px;
+    --font-size-stat: 34px;
+    --font-size-big-number: 42px;
+
+    --sidebar-width: 290px;
+    --header-height: 72px;
+    --content-max-width: 1440px;
+
+    --space-xxs: 4px;
+    --space-xs: 5px;
+    --space-sm: 8px;
+    --space-md: 12px;
+    --space-lg: 16px;
+    --space-xl: 22px;
+    --space-2xl: 32px;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 14px;
+    --radius-xl: 22px;
+    --radius-2xl: 24px;
+    --radius-pill: 999px;
+
+    --transition-fast: 0.18s ease;
+    --transition-normal: 0.3s ease;
+}

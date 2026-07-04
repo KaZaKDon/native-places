@@ -1,0 +1,37 @@
+.dashboard-panel {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    overflow: hidden;
+}
+
+.dashboard-panel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-lg);
+    padding: var(--space-xl);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.dashboard-panel__header h3 {
+    margin: 0;
+    font-size: var(--font-size-subtitle);
+}
+
+.dashboard-panel__header span {
+    display: grid;
+    place-items: center;
+    min-width: 30px;
+    height: 28px;
+    padding: 0 9px;
+    border-radius: var(--radius-pill);
+    background: var(--color-soft-bg);
+    color: var(--color-primary);
+    font-size: var(--font-size-sm);
+    font-weight: 800;
+}
+
+.dashboard-panel__body {
+    display: grid;
+}

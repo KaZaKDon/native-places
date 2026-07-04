@@ -1,0 +1,153 @@
+.add-route-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    display: grid;
+    place-items: center;
+
+    padding: 20px;
+
+    background: rgba(7, 11, 18, 0.68);
+}
+
+.add-route-modal__card {
+    position: relative;
+
+    width: min(520px, 100%);
+
+    padding: 26px;
+
+    border: 1px solid var(--border-soft);
+    border-radius: 26px;
+
+    background: var(--color-surface);
+    color: var(--color-text);
+
+    box-shadow: var(--shadow-soft);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+}
+
+.add-route-modal__close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+
+    width: 36px;
+    height: 36px;
+
+    border: 0;
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--color-text);
+
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.add-route-modal__empty a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-top: 14px;
+    padding: 0 18px;
+
+    color: var(--color-bg);
+    text-decoration: none;
+}
+
+.add-route-form__submit:disabled {
+    cursor: wait;
+    opacity: 0.68;
+}
+
+.add-route-modal__eyebrow {
+    margin: 0 0 8px;
+
+    color: var(--color-gold);
+
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.add-route-modal__card h2 {
+    margin: 0 0 20px;
+
+    font-size: 28px;
+    line-height: 1.1;
+}
+
+.add-route-form {
+    display: grid;
+    gap: 16px;
+}
+
+.add-route-form label {
+    display: grid;
+    gap: 8px;
+}
+
+.add-route-form span {
+    color: var(--color-text-muted);
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.add-route-form select {
+    width: 100%;
+    min-height: 48px;
+
+    padding: 0 14px;
+
+    border: 1px solid var(--border-soft);
+    border-radius: 14px;
+
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--color-text);
+
+    font: inherit;
+}
+
+.add-route-form__submit,
+.add-route-modal__empty a {
+    min-height: 48px;
+
+    border: 0;
+    border-radius: 16px;
+
+    background: linear-gradient(
+        135deg,
+        var(--color-gold),
+        var(--color-gold-light)
+    );
+
+    color: var(--color-bg);
+
+    font: inherit;
+    font-weight: 800;
+
+    cursor: pointer;
+}
+
+.add-route-modal__empty {
+    padding: 18px;
+
+    border: 1px solid var(--border-soft);
+    border-radius: 18px;
+
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.add-route-modal__empty p,
+.add-route-modal__status {
+    margin: 0;
+
+    color: var(--color-text-muted);
+    line-height: 1.5;
+}

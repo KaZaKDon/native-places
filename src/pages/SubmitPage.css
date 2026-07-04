@@ -1,0 +1,606 @@
+.submit-page {
+    min-height: 100svh;
+    background:
+        radial-gradient(circle at 18% 10%, rgba(96, 126, 88, 0.18), transparent 34%),
+        linear-gradient(135deg, #07111f 0%, #101827 48%, #060914 100%);
+    color: rgba(255, 248, 232, 0.94);
+}
+
+.submit-hero {
+    min-height: 100svh;
+    display: grid;
+    grid-template-columns: minmax(320px, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(28px, 5vw, 72px);
+    padding: clamp(28px, 5vw, 76px);
+}
+
+.submit-hero__content {
+    align-self: start;
+    position: sticky;
+    top: 48px;
+}
+
+.submit-page__back {
+    display: inline-flex;
+    margin-bottom: 42px;
+    color: rgba(255, 248, 232, 0.7);
+    text-decoration: none;
+}
+
+.submit-page__back:hover {
+    color: rgba(255, 248, 232, 0.95);
+}
+
+.submit-page__eyebrow {
+    margin: 0 0 18px;
+    color: var(--color-gold-light);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.submit-hero h1 {
+    margin: 0;
+    max-width: 680px;
+    font-size: clamp(38px, 6vw, 76px);
+    line-height: 0.96;
+    letter-spacing: -0.055em;
+}
+
+.submit-hero__lead {
+    max-width: 620px;
+    margin: 28px 0 0;
+    color: rgba(255, 248, 232, 0.68);
+    font-size: clamp(16px, 1.5vw, 20px);
+    line-height: 1.65;
+}
+
+.submit-form {
+    display: grid;
+    gap: 18px;
+}
+
+.submit-form__section {
+    padding: 26px;
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background:
+        radial-gradient(circle at 10% 0%, rgba(244, 213, 141, 0.08), transparent 32%),
+        rgba(255, 255, 255, 0.055);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+}
+
+.submit-form__section h2 {
+    margin: 0 0 20px;
+    font-size: 24px;
+    letter-spacing: -0.03em;
+}
+
+.submit-form__field {
+    display: grid;
+    gap: 9px;
+}
+
+.submit-form__field + .submit-form__field {
+    margin-top: 16px;
+}
+
+.submit-form__field span {
+    color: rgba(255, 248, 232, 0.64);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.submit-form__field input,
+.submit-form__field select,
+.submit-form__field textarea {
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.07);
+    color: rgba(255, 248, 232, 0.92);
+    font: inherit;
+    outline: none;
+}
+
+.submit-form__field input,
+.submit-form__field select {
+    min-height: 48px;
+    padding: 0 14px;
+}
+
+.submit-form__field select {
+    cursor: pointer;
+}
+
+.submit-form__field textarea {
+    resize: vertical;
+    padding: 14px;
+}
+
+.submit-form__field input:focus,
+.submit-form__field select:focus,
+.submit-form__field textarea:focus {
+    border-color: rgba(244, 213, 141, 0.5);
+    box-shadow: 0 0 0 4px rgba(244, 213, 141, 0.1);
+}
+
+.submit-category-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.submit-category {
+    min-height: 42px;
+    padding: 0 16px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 248, 232, 0.86);
+    font-weight: 800;
+    cursor: pointer;
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.submit-category:hover {
+    transform: translateY(-1px);
+    border-color: rgba(168, 202, 150, 0.38);
+    background: rgba(96, 126, 88, 0.18);
+}
+
+.submit-category.is-active {
+    background:
+        linear-gradient(135deg, rgba(96, 126, 88, 0.92), rgba(47, 63, 44, 0.92));
+    border-color: rgba(168, 202, 150, 0.3);
+    color: #f6f3ea;
+}
+
+.submit-type-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.submit-type {
+    min-height: 38px;
+    padding: 0 14px;
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.045);
+    color: rgba(255, 248, 232, 0.76);
+
+    font-size: 13px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.submit-type:hover {
+    transform: translateY(-1px);
+    border-color: rgba(168, 202, 150, 0.3);
+    background: rgba(96, 126, 88, 0.12);
+}
+
+.submit-type.is-active {
+    border-color: rgba(168, 202, 150, 0.36);
+    background: rgba(96, 126, 88, 0.26);
+    color: #f6f3ea;
+}
+
+.submit-form__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.submit-form__grid .submit-form__field {
+    margin-top: 0;
+}
+
+.submit-location-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    margin-top: 16px;
+    padding: 18px;
+
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.submit-location-box div {
+    display: grid;
+    gap: 6px;
+}
+
+.submit-location-box span {
+    color: rgba(255, 248, 232, 0.58);
+
+    font-size: 13px;
+}
+
+.submit-location-box strong {
+    color: rgba(255, 248, 232, 0.94);
+}
+
+.submit-location-box__button {
+    min-height: 42px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 16px;
+
+    border-radius: 999px;
+    border: 1px solid rgba(168, 202, 150, 0.28);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(96, 126, 88, 0.92),
+            rgba(47, 63, 44, 0.92)
+        );
+
+    color: #f6f3ea;
+
+    font-size: 13px;
+    font-weight: 900;
+
+    text-decoration: none;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.submit-location-box__button:hover {
+    transform: translateY(-1px);
+
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.24);
+}
+
+.submit-form__note {
+    margin: 18px 0 0;
+    color: rgba(255, 248, 232, 0.58);
+    line-height: 1.55;
+}
+
+.submit-form__status {
+    padding: 16px 18px;
+
+    border-radius: 18px;
+    border: 1px solid rgba(244, 213, 141, 0.22);
+
+    background: rgba(244, 213, 141, 0.08);
+    color: rgba(255, 248, 232, 0.86);
+
+    line-height: 1.5;
+}
+
+.submit-form__submit {
+    min-height: 58px;
+    border: 1px solid rgba(168, 202, 150, 0.28);
+    border-radius: 20px;
+    background:
+        linear-gradient(135deg, rgba(96, 126, 88, 0.94), rgba(47, 63, 44, 0.94));
+    color: #f6f3ea;
+    font-weight: 900;
+    cursor: pointer;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.submit-form__submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.26);
+}
+
+.submit-form__image-preview {
+    width: 100%;
+    max-height: 260px;
+    object-fit: cover;
+
+    margin-top: 14px;
+
+    border-radius: 18px;
+    border: 1px solid rgba(255, 248, 232, 0.16);
+
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.24);
+}
+
+.submit-gallery-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 14px;
+    margin-top: 16px;
+}
+
+.submit-gallery-preview__item {
+    overflow: hidden;
+    border-radius: 18px;
+    background: rgba(255, 248, 232, 0.08);
+    border: 1px solid rgba(255, 248, 232, 0.14);
+}
+
+.submit-gallery-preview__item img {
+    width: 100%;
+    height: 110px;
+    display: block;
+    object-fit: cover;
+}
+
+.submit-gallery-preview__item button {
+    width: 100%;
+    padding: 10px 12px;
+
+    border: none;
+    background: rgba(255, 120, 98, 0.14);
+    color: rgba(255, 248, 232, 0.92);
+
+    font: inherit;
+    font-size: 13px;
+    font-weight: 800;
+
+    cursor: pointer;
+}
+
+.submit-locality-combobox {
+    position: relative;
+    display: grid;
+    gap: 8px;
+}
+
+.submit-locality-combobox__selected {
+    color: rgba(168, 202, 150, 0.95);
+    font-size: 13px;
+}
+
+.submit-locality-combobox__menu {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 18px;
+    background: rgba(15, 23, 37, 0.98);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+}
+
+.submit-locality-option {
+    display: grid;
+    width: 100%;
+    gap: 4px;
+    padding: 12px;
+    border: 0;
+    border-radius: 14px;
+    background: transparent;
+    color: rgba(255, 248, 232, 0.9);
+    text-align: left;
+    cursor: pointer;
+}
+
+.submit-locality-option:hover,
+.submit-locality-option:focus-visible {
+    background: rgba(244, 213, 141, 0.1);
+    outline: none;
+}
+
+.submit-locality-option strong {
+    font-size: 14px;
+}
+
+.submit-locality-option span,
+.submit-locality-combobox__message,
+.submit-locality-field small {
+    color: rgba(255, 248, 232, 0.62);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.submit-locality-combobox__message {
+    margin: 0;
+    padding: 12px;
+}
+
+.submit-locality-combobox__message.is-error {
+    color: #ffb4a8;
+}
+
+.submit-form__note--top {
+    margin-top: -8px;
+    margin-bottom: 18px;
+}
+
+.submit-plan-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+}
+
+.submit-plan {
+    position: relative;
+    min-height: 190px;
+    padding: 18px;
+    display: grid;
+    align-content: start;
+    gap: 10px;
+    text-align: left;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 248, 232, 0.88);
+    cursor: pointer;
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.submit-plan:hover {
+    transform: translateY(-2px);
+    border-color: rgba(168, 202, 150, 0.32);
+    background: rgba(96, 126, 88, 0.14);
+}
+
+.submit-plan.is-active {
+    border-color: rgba(168, 202, 150, 0.5);
+    background:
+        radial-gradient(circle at 20% 0%, rgba(244, 213, 141, 0.14), transparent 38%),
+        rgba(96, 126, 88, 0.28);
+    box-shadow: 0 20px 52px rgba(0, 0, 0, 0.2);
+}
+
+.submit-plan__badge {
+    width: max-content;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: rgba(244, 213, 141, 0.14);
+    color: var(--color-gold-light);
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.submit-plan strong {
+    color: rgba(255, 248, 232, 0.96);
+    font-size: 18px;
+    letter-spacing: -0.02em;
+}
+
+.submit-plan span:not(.submit-plan__badge),
+.submit-plan small {
+    color: rgba(255, 248, 232, 0.64);
+    line-height: 1.45;
+}
+
+.submit-plan b {
+    align-self: end;
+    color: #f6f3ea;
+    font-size: 20px;
+}
+
+@media (max-width: 900px) {
+    .submit-hero {
+        grid-template-columns: 1fr;
+        padding: 24px 20px 48px;
+    }
+
+    .submit-hero__content {
+        position: static;
+    }
+
+    .submit-page__back {
+        margin-bottom: 28px;
+    }
+
+    .submit-hero h1 {
+        font-size: clamp(34px, 11vw, 54px);
+    }
+
+    .submit-form__section {
+        padding: 20px;
+        border-radius: 24px;
+    }
+
+    .submit-form__grid {
+        grid-template-columns: 1fr;
+    }
+}
+.submit-form__note--top {
+    margin-top: -8px;
+    margin-bottom: 18px;
+}
+
+.submit-plan-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+}
+
+.submit-plan {
+    position: relative;
+    min-height: 190px;
+    padding: 18px;
+    display: grid;
+    align-content: start;
+    gap: 10px;
+    text-align: left;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 248, 232, 0.88);
+    cursor: pointer;
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.submit-plan:hover {
+    transform: translateY(-2px);
+    border-color: rgba(168, 202, 150, 0.32);
+    background: rgba(96, 126, 88, 0.14);
+}
+
+.submit-plan.is-active {
+    border-color: rgba(168, 202, 150, 0.5);
+    background:
+        radial-gradient(circle at 20% 0%, rgba(244, 213, 141, 0.14), transparent 38%),
+        rgba(96, 126, 88, 0.28);
+    box-shadow: 0 20px 52px rgba(0, 0, 0, 0.2);
+}
+
+.submit-plan__badge {
+    width: max-content;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: rgba(244, 213, 141, 0.14);
+    color: var(--color-gold-light);
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.submit-plan strong {
+    color: rgba(255, 248, 232, 0.96);
+    font-size: 18px;
+    letter-spacing: -0.02em;
+}
+
+.submit-plan span:not(.submit-plan__badge),
+.submit-plan small {
+    color: rgba(255, 248, 232, 0.64);
+    line-height: 1.45;
+}
+
+.submit-plan b {
+    align-self: end;
+    color: #f6f3ea;
+    font-size: 20px;
+}

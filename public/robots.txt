@@ -1,0 +1,12 @@
+User-agent: *
+
+Allow: /
+
+Disallow: /auth
+Disallow: /account
+Disallow: /submit
+Disallow: /submit/location
+Disallow: /admin
+Disallow: /routes/
+
+Sitemap: https://native-places.ru/sitemap.xml

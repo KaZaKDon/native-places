@@ -1,0 +1,144 @@
+.route-create-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    display: grid;
+    place-items: center;
+
+    padding: 20px;
+
+    background: rgba(28, 20, 13, 0.48);
+}
+
+.route-create-modal__card {
+    position: relative;
+
+    width: min(520px, 100%);
+
+    padding: 22px;
+
+    border-radius: 24px;
+
+    background: #f2e3c8;
+    color: #3c2b1c;
+
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.32);
+}
+
+.route-create-modal__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+
+    width: 34px;
+    height: 34px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(96, 65, 34, 0.14);
+    color: #3c2b1c;
+
+    font-size: 24px;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+.route-create-modal h2 {
+    margin: 0 0 18px;
+
+    font-size: 28px;
+    line-height: 1.1;
+    text-transform: uppercase;
+}
+
+.route-create-form {
+    display: grid;
+    gap: 12px;
+}
+
+.route-create-form label {
+    display: grid;
+    gap: 6px;
+}
+
+.route-create-form span {
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.route-create-form input,
+.route-create-form select,
+.route-create-form textarea {
+    width: 100%;
+
+    padding: 11px 12px;
+
+    border: 1px solid rgba(96, 65, 34, 0.18);
+    border-radius: 14px;
+
+    background: rgba(255, 248, 232, 0.52);
+    color: #3c2b1c;
+
+    font: inherit;
+}
+
+.route-create-form textarea {
+    resize: vertical;
+}
+
+.route-create-form__add,
+.route-create-form__submit {
+    min-height: 38px;
+
+    border: 1px solid rgba(96, 65, 34, 0.16);
+    border-radius: 999px;
+
+    background: rgba(96, 65, 34, 0.14);
+    color: #3c2b1c;
+
+    font: inherit;
+    font-weight: 900;
+
+    cursor: pointer;
+}
+
+.route-create-form__add:disabled,
+.route-create-form__submit:disabled {
+    opacity: 0.42;
+    cursor: default;
+}
+
+.route-create-form__places {
+    display: grid;
+    gap: 8px;
+
+    padding: 10px;
+
+    border-radius: 16px;
+
+    background: rgba(96, 65, 34, 0.1);
+}
+
+.route-create-form__place {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    font-size: 14px;
+}
+
+.route-create-form__place button {
+    border: none;
+    background: transparent;
+    color: #8f3f31;
+
+    font: inherit;
+    font-size: 12px;
+    font-weight: 900;
+
+    cursor: pointer;
+}

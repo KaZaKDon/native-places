@@ -1,0 +1,48 @@
+.account-route-form {
+    display: grid;
+    gap: 8px;
+
+    margin-top: 16px;
+}
+
+.account-route-form input,
+.account-route-form select,
+.account-route-form textarea {
+    width: 100%;
+
+    padding: 10px 12px;
+
+    border: 1px solid rgba(96, 65, 34, 0.16);
+    border-radius: 14px;
+
+    background: rgba(255, 248, 232, 0.28);
+    color: #3c2b1c;
+
+    font: inherit;
+}
+
+.account-route-form textarea {
+    resize: vertical;
+}
+
+.account-route-form .account-book-section__button {
+    justify-content: center;
+
+    margin-top: 4px;
+}
+
+.account-routes__create {
+    margin-top: 14px;
+    margin-bottom: 10px;
+}
+
+.account-archive-route {
+    width: 100%;
+}
+
+.account-archive-route__actions {
+    display: flex;
+    justify-content: center;
+
+    margin-top: 12px;
+}

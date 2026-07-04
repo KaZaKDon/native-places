@@ -1,0 +1,51 @@
+.account-favorite-card {
+    display: grid;
+    gap: 10px;
+}
+
+.account-favorite-card__image {
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    border-radius: 0;
+}
+
+.account-favorite-card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.account-favorite-card__image span {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    background: rgba(96, 65, 34, 0.1);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.account-favorite-card__category {
+    font-size: 14px;
+    opacity: 0.82;
+}
+
+.account-favorite-card h2 {
+    margin: 12px 0 0;
+    font-size: 20px;
+    line-height: 1.15;
+    text-transform: uppercase;
+}
+
+.account-favorite-card p {
+    margin: 8px 20px 0;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.account-favorite-card__actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
