@@ -978,8 +978,44 @@ api/admin/users/show.php
   "user": {},
   "places": [],
   "subscription": {},
-  "subscriptions": []
+  "subscriptions": [],
+  "consents": []
 }
+```
+
+Для блока согласий пользователя `show.php` должен дополнительно читать `user_consents`:
+
+```php
+$consentsStmt = $pdo->prepare("
+    SELECT
+        id,
+        user_id,
+        consent_type,
+        document_version,
+        accepted_at,
+        ip_address,
+        user_agent,
+        created_at
+    FROM user_consents
+    WHERE user_id = :user_id
+    ORDER BY accepted_at DESC, id DESC
+");
+
+$consentsStmt->execute([
+    'user_id' => $userId,
+]);
+```
+
+И вернуть результат рядом с остальными данными карточки:
+
+```php
+successResponse([
+    'user' => $user,
+    'places' => $placesStmt->fetchAll(),
+    'subscription' => $subscriptionStmt->fetch() ?: null,
+    'subscriptions' => $subscriptionsStmt->fetchAll(),
+    'consents' => $consentsStmt->fetchAll(),
+]);
 ```
 
 ---

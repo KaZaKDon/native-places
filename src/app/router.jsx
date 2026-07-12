@@ -9,6 +9,7 @@ import {
     CategoriesPage,
     CategoryPage,
     HomePage,
+    LegalPage,
     MapPage,
     NotFoundPage,
     PlacePage,
@@ -16,6 +17,7 @@ import {
     SharedRoutePage,
     SubmitLocationPage,
     SubmitPage,
+    VerifyEmailPage,
 } from "./lazyRoutePages";
 
 function withPageLoader(element) {
@@ -44,6 +46,23 @@ export const router = createBrowserRouter([
             {
                 path: "auth",
                 element: withPageLoader(<AuthPage />),
+            },
+
+            {
+                path: "verify-email",
+                element: withPageLoader(<VerifyEmailPage />),
+            },
+            {
+                path: "rules",
+                element: withPageLoader(<LegalPage type="rules" />),
+            },
+            {
+                path: "privacy-policy",
+                element: withPageLoader(<LegalPage type="privacy" />),
+            },
+            {
+                path: "user-agreement",
+                element: withPageLoader(<LegalPage type="agreement" />),
             },
             {
                 path: "categories",

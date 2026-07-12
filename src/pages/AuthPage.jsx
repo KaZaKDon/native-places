@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import { authApi } from "../shared/api/authApi";
 import { EyeIcon } from "../shared/icons/EyeIcon";
@@ -14,6 +14,9 @@ const initialForm = {
     password: "",
     passwordConfirm: "",
     resetToken: "",
+    acceptedTerms: false,
+    acceptedPersonalData: false,
+    acceptedMarketing: false,
 };
 
 function getInitialMode(searchParams) {
@@ -40,6 +43,7 @@ export function AuthPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [statusMessage, setStatusMessage] = useState("");
+    const [verificationNotice, setVerificationNotice] = useState(null);
 
     const isLoginMode = mode === "login";
     const isRegisterMode = mode === "register";
@@ -73,11 +77,11 @@ export function AuthPage() {
     }, [isForgotMode, isLoginMode, isResetMode]);
 
     function handleChange(event) {
-        const { name, value } = event.target;
+        const { checked, name, type, value } = event.target;
 
         setForm((currentForm) => ({
             ...currentForm,
-            [name]: value,
+            [name]: type === "checkbox" ? checked : value,
         }));
     }
 
@@ -85,7 +89,32 @@ export function AuthPage() {
         setMode(nextMode);
         setErrorMessage("");
         setStatusMessage("");
+        setVerificationNotice(null);
         setShowPassword(false);
+    }
+
+    async function handleResendVerification() {
+        if (!verificationNotice?.email) {
+            return;
+        }
+
+        setIsSubmitting(true);
+        setErrorMessage("");
+        setStatusMessage("");
+
+        try {
+            const data = await authApi.resendVerification(verificationNotice.email);
+
+            setVerificationNotice((currentNotice) => ({
+                ...currentNotice,
+                expiresAt: data.verification_expires_at || currentNotice?.expiresAt || "",
+            }));
+            setStatusMessage(data.message || "Письмо подтверждения отправлено повторно.");
+        } catch (error) {
+            setErrorMessage(error.message || "Не удалось отправить письмо повторно");
+        } finally {
+            setIsSubmitting(false);
+        }
     }
 
     async function handleSubmit(event) {
@@ -128,23 +157,69 @@ export function AuthPage() {
                 return;
             }
 
+            if (isRegisterMode) {
+                if (form.password !== form.passwordConfirm) {
+                    setErrorMessage("Пароли не совпадают.");
+                    return;
+                }
+
+                if (!form.acceptedTerms) {
+                    setErrorMessage("Подтвердите согласие с правилами сайта.");
+                    return;
+                }
+
+                if (!form.acceptedPersonalData) {
+                    setErrorMessage("Подтвердите согласие на обработку персональных данных.");
+                    return;
+                }
+            }
+
             if (isLoginMode) {
                 await login({
                     email: form.email,
                     password: form.password,
                 });
             } else {
-                await register({
+                const registerData = await register({
                     firstName: form.firstName,
                     email: form.email,
                     password: form.password,
+                    acceptedTerms: form.acceptedTerms,
+                    acceptedPersonalData: form.acceptedPersonalData,
+                    acceptedMarketing: form.acceptedMarketing,
                 });
+
+                if (registerData?.requires_email_verification) {
+                    setVerificationNotice({
+                        email: registerData.email || form.email,
+                        expiresAt: registerData.verification_expires_at || "",
+                    });
+                    setForm({
+                        ...initialForm,
+                        email: registerData.email || form.email,
+                    });
+                    setShowPassword(false);
+                    setStatusMessage(registerData.message || "Проверьте почту и подтвердите email.");
+                    return;
+                }
             }
 
             setForm(initialForm);
             setShowPassword(false);
             navigate("/account");
         } catch (error) {
+            if (isLoginMode && error.extra?.code === "email_not_verified") {
+                setVerificationNotice({
+                    email: error.extra.email || form.email,
+                    expiresAt: error.extra.verification_expires_at || "",
+                });
+                setStatusMessage(
+                    error.message ||
+                    "Подтвердите email перед входом. Если письма нет, отправьте его повторно."
+                );
+                return;
+            }
+            
             setErrorMessage(error.message || "Не удалось выполнить действие");
         } finally {
             setIsSubmitting(false);
@@ -191,149 +266,273 @@ export function AuthPage() {
                     </button>
                 </div>
 
-                <form className="auth-form" onSubmit={handleSubmit}>
-                    {isRegisterMode && (
-                        <label className="auth-form__field">
-                            <span>Имя</span>
-                            <input
-                                name="firstName"
-                                type="text"
-                                value={form.firstName}
-                                onChange={handleChange}
-                                placeholder="Например, Дмитрий"
-                                autoComplete="given-name"
-                                required
-                            />
-                        </label>
-                    )}
+                {verificationNotice ? (
+                    <div className="auth-verification-notice">
+                        <h2>Проверьте почту</h2>
 
-                    {isResetMode && (
-                        <label className="auth-form__field">
-                            <span>Код восстановления</span>
-                            <input
-                                name="resetToken"
-                                type="text"
-                                value={form.resetToken}
-                                onChange={handleChange}
-                                placeholder="Код из письма"
-                                autoComplete="one-time-code"
-                                required
-                            />
-                        </label>
-                    )}
+                        <p>
+                            Мы отправили письмо подтверждения на <strong>{verificationNotice.email}</strong>.
+                            Перейдите по ссылке из письма, чтобы завершить регистрацию.
+                        </p>
 
-                    {!isResetMode && (
-                        <label className="auth-form__field">
-                            <span>Email</span>
-                            <input
-                                name="email"
-                                type="email"
-                                value={form.email}
-                                onChange={handleChange}
-                                placeholder="you@example.com"
-                                autoComplete="email"
-                                required
-                            />
-                        </label>
-                    )}
+                        {verificationNotice.expiresAt ? (
+                            <p className="auth-verification-notice__meta">
+                                Ссылка действует до: {verificationNotice.expiresAt}
+                            </p>
+                        ) : null}
 
-                    {!isForgotMode && (
-                        <label className="auth-form__field">
-                            <span>{isResetMode ? "Новый пароль" : "Пароль"}</span>
+                        {statusMessage && (
+                            <p className="auth-form__success" role="status">
+                                {statusMessage}
+                            </p>
+                        )}
 
-                            <div className="auth-form__password">
+                        {errorMessage && (
+                            <p className="auth-form__error" role="alert">
+                                {errorMessage}
+                            </p>
+                        )}
+
+                        <div className="auth-verification-notice__actions">
+                            <button
+                                className="auth-form__submit"
+                                type="button"
+                                onClick={handleResendVerification}
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? "Отправляем..." : "Отправить письмо повторно"}
+                            </button>
+
+                            <button
+                                className="auth-form__link"
+                                type="button"
+                                onClick={() => handleModeChange("login")}
+                            >
+                                Перейти ко входу
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <form className="auth-form" onSubmit={handleSubmit}>
+                        {isRegisterMode && (
+                            <label className="auth-form__field">
+                                <span>Имя</span>
                                 <input
-                                    name="password"
-                                    type={showPassword ? "text" : "password"}
-                                    value={form.password}
+                                    name="firstName"
+                                    type="text"
+                                    value={form.firstName}
                                     onChange={handleChange}
-                                    placeholder="Минимум 6 символов"
-                                    autoComplete={isLoginMode ? "current-password" : "new-password"}
+                                    placeholder="Например, Дмитрий"
+                                    autoComplete="given-name"
+                                    required
+                                />
+                            </label>
+                        )}
+
+                        {isResetMode && (
+                            <label className="auth-form__field">
+                                <span>Код восстановления</span>
+                                <input
+                                    name="resetToken"
+                                    type="text"
+                                    value={form.resetToken}
+                                    onChange={handleChange}
+                                    placeholder="Код из письма"
+                                    autoComplete="one-time-code"
+                                    required
+                                />
+                            </label>
+                        )}
+
+                        {!isResetMode && (
+                            <label className="auth-form__field">
+                                <span>Email</span>
+                                <input
+                                    name="email"
+                                    type="email"
+                                    value={form.email}
+                                    onChange={handleChange}
+                                    placeholder="you@example.com"
+                                    autoComplete="email"
+                                    required
+                                />
+                            </label>
+                        )}
+
+                        {!isForgotMode && (
+                            <label className="auth-form__field">
+                                <span>{isResetMode ? "Новый пароль" : "Пароль"}</span>
+
+                                <div className="auth-form__password">
+                                    <input
+                                        name="password"
+                                        type={showPassword ? "text" : "password"}
+                                        value={form.password}
+                                        onChange={handleChange}
+                                        placeholder="Минимум 6 символов"
+                                        autoComplete={isLoginMode ? "current-password" : "new-password"}
+                                        required
+                                        minLength={6}
+                                    />
+
+                                    <button
+                                        className="auth-form__password-toggle"
+                                        type="button"
+                                        onClick={() => setShowPassword((currentValue) => !currentValue)}
+                                        aria-label={showPassword ? "Скрыть пароль" : "Показать пароль"}
+                                        title={showPassword ? "Скрыть пароль" : "Показать пароль"}
+                                    >
+                                        {showPassword ? (
+                                            <EyeOffIcon aria-hidden="true" />
+                                        ) : (
+                                            <EyeIcon aria-hidden="true" />
+                                        )}
+                                    </button>
+                                </div>
+                            </label>
+                        )}
+
+                        {(isRegisterMode || isResetMode) && (
+                            <label className="auth-form__field">
+                                <span>
+                                    {isResetMode
+                                        ? "Повторите пароль"
+                                        : "Повторите пароль для регистрации"}
+                                </span>
+                                <input
+                                    name="passwordConfirm"
+                                    type={showPassword ? "text" : "password"}
+                                    value={form.passwordConfirm}
+                                    onChange={handleChange}
+                                    placeholder={
+                                        isResetMode
+                                            ? "Повторите новый пароль"
+                                            : "Повторите пароль"
+                                    }
+                                    autoComplete="new-password"
                                     required
                                     minLength={6}
                                 />
+                            </label>
+                        )}
 
-                                <button
-                                    className="auth-form__password-toggle"
-                                    type="button"
-                                    onClick={() => setShowPassword((currentValue) => !currentValue)}
-                                    aria-label={showPassword ? "Скрыть пароль" : "Показать пароль"}
-                                    title={showPassword ? "Скрыть пароль" : "Показать пароль"}
-                                >
-                                    {showPassword ? (
-                                        <EyeOffIcon aria-hidden="true" />
-                                    ) : (
-                                        <EyeIcon aria-hidden="true" />
-                                    )}
-                                </button>
+                        {isRegisterMode && (
+                            <div className="auth-form__checkboxes">
+                                <label className="auth-form__checkbox">
+                                    <input
+                                        name="acceptedTerms"
+                                        type="checkbox"
+                                        checked={form.acceptedTerms}
+                                        onChange={handleChange}
+                                        required
+                                    />
+
+                                    <span>
+                                        Я принимаю{" "}
+                                        <Link to="/rules" state={{ from: "/auth" }}>
+                                            правила сайта
+                                        </Link>{" "}
+                                        и{" "}
+                                        <Link to="/user-agreement" state={{ from: "/auth" }}>
+                                            пользовательское соглашение
+                                        </Link>
+                                        .
+                                    </span>
+                                </label>
+
+                                <label className="auth-form__checkbox">
+                                    <input
+                                        name="acceptedPersonalData"
+                                        type="checkbox"
+                                        checked={form.acceptedPersonalData}
+                                        onChange={handleChange}
+                                        required
+                                    />
+
+                                    <span>
+                                        Я даю согласие на обработку персональных данных и ознакомлен с{" "}
+                                        <Link to="/privacy-policy" state={{ from: "/auth" }}>
+                                            политикой конфиденциальности
+                                        </Link>
+                                        .
+                                    </span>
+                                </label>
+
+                                <label className="auth-form__checkbox">
+                                    <input
+                                        name="acceptedMarketing"
+                                        type="checkbox"
+                                        checked={form.acceptedMarketing}
+                                        onChange={handleChange}
+                                    />
+
+                                    <span>
+                                        Я согласен получать новости и информационные письма Native Places.
+                                    </span>
+                                </label>
                             </div>
-                        </label>
-                    )}
+                        )}
 
-                    {isResetMode && (
-                        <label className="auth-form__field">
-                            <span>Повторите пароль</span>
-                            <input
-                                name="passwordConfirm"
-                                type={showPassword ? "text" : "password"}
-                                value={form.passwordConfirm}
-                                onChange={handleChange}
-                                placeholder="Повторите новый пароль"
-                                autoComplete="new-password"
-                                required
-                                minLength={6}
-                            />
-                        </label>
-                    )}
+                        {isLoginMode && (
+                            <button
+                                className="auth-form__link"
+                                type="button"
+                                onClick={() => handleModeChange("forgot")}
+                            >
+                                Забыли пароль?
+                            </button>
+                        )}
 
-                    {isLoginMode && (
+                        {(isForgotMode || isResetMode) && (
+                            <button
+                                className="auth-form__link auth-form__link--back"
+                                type="button"
+                                onClick={() => handleModeChange("login")}
+                            >
+                                ← Вернуться ко входу
+                            </button>
+                        )}
+
+                        {errorMessage && (
+                            <p className="auth-form__error" role="alert">
+                                {errorMessage}
+                            </p>
+                        )}
+
+                        {statusMessage && (
+                            <p className="auth-form__success" role="status">
+                                {statusMessage}
+                            </p>
+                        )}
+
                         <button
-                            className="auth-form__link"
-                            type="button"
-                            onClick={() => handleModeChange("forgot")}
+                            className="auth-form__submit"
+                            type="submit"
+                            disabled={isSubmitting}
                         >
-                            Забыли пароль?
+                            {isSubmitting
+                                ? "Подождите..."
+                                : isForgotMode
+                                    ? "Отправить ссылку"
+                                    : isResetMode
+                                        ? "Сохранить пароль"
+                                        : isLoginMode
+                                            ? "Войти"
+                                            : "Создать аккаунт"}
                         </button>
-                    )}
-
-                    {(isForgotMode || isResetMode) && (
-                        <button
-                            className="auth-form__link auth-form__link--back"
-                            type="button"
-                            onClick={() => handleModeChange("login")}
-                        >
-                            ← Вернуться ко входу
-                        </button>
-                    )}
-
-                    {errorMessage && (
-                        <p className="auth-form__error" role="alert">
-                            {errorMessage}
-                        </p>
-                    )}
-
-                    {statusMessage && (
-                        <p className="auth-form__success" role="status">
-                            {statusMessage}
-                        </p>
-                    )}
-
-                    <button
-                        className="auth-form__submit"
-                        type="submit"
-                        disabled={isSubmitting}
-                    >
-                        {isSubmitting
-                            ? "Подождите..."
-                            : isForgotMode
-                                ? "Отправить ссылку"
-                                : isResetMode
-                                    ? "Сохранить пароль"
-                                    : isLoginMode
-                                        ? "Войти"
-                                        : "Создать аккаунт"}
-                    </button>
-                </form>
+                    </form>
+                )}
+                <nav className="auth-card__legal-links" aria-label="Документы сайта">
+                    <Link to="/rules" state={{ from: "/auth" }}>
+                        Правила
+                    </Link>
+                    <Link to="/user-agreement" state={{ from: "/auth" }}>
+                        Соглашение
+                    </Link>
+                    <Link to="/privacy-policy" state={{ from: "/auth" }}>
+                        Конфиденциальность
+                    </Link>
+                </nav>
             </section>
         </main>
     );

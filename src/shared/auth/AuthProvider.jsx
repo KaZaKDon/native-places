@@ -3,6 +3,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { authApi } from "../api/authApi";
 import { AuthContext } from "./context";
 
+function isEmailVerified(user) {
+    return Boolean(user?.email_verified_at);
+}
+
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [authChecked, setAuthChecked] = useState(false);
@@ -19,7 +23,7 @@ export function AuthProvider({ children }) {
                     return;
                 }
 
-                if (data?.authenticated) {
+                if (data?.authenticated && isEmailVerified(data.user)) {
                     setUser(data.user);
                 } else {
                     setUser(null);
@@ -51,33 +55,31 @@ export function AuthProvider({ children }) {
             password,
         });
 
-        if (data?.authenticated) {
+        if (data?.authenticated && isEmailVerified(data.user)) {
             setUser(data.user);
+        } else {
+            setUser(null);
         }
 
         return data;
     }, []);
 
-    const register = useCallback(async ({ firstName, email, password }) => {
-        const registerData = await authApi.register({
+    const register = useCallback(async ({
+        firstName,
+        email,
+        password,
+        acceptedTerms,
+        acceptedPersonalData,
+        acceptedMarketing,
+    }) => {
+        return authApi.register({
             firstName,
             email,
             password,
+            acceptedTerms,
+            acceptedPersonalData,
+            acceptedMarketing,
         });
-
-        const loginData = await authApi.login({
-            email,
-            password,
-        });
-
-        if (loginData?.authenticated) {
-            setUser(loginData.user);
-        }
-
-        return {
-            registerData,
-            loginData,
-        };
     }, []);
 
     const logout = useCallback(async () => {

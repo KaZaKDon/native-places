@@ -14,6 +14,7 @@ import { UserPlaces } from "./components/UserPlaces";
 import { UserSubscriptionCard } from "./components/UserSubscriptionCard";
 import { UserSubscriptionsHistory } from "./components/UserSubscriptionsHistory";
 import { UserManagementCard } from "./components/UserManagementCard";
+import { UserConsents } from "./components/UserConsents";
 
 import "./UserPage.css";
 
@@ -43,6 +44,7 @@ export function UserPage() {
     const [places, setPlaces] = useState([]);
     const [subscription, setSubscription] = useState(null);
     const [subscriptions, setSubscriptions] = useState([]);
+    const [consents, setConsents] = useState([]);
     const [reloadKey, setReloadKey] = useState(0);
 
     const [isLoading, setIsLoading] = useState(true);
@@ -63,6 +65,7 @@ export function UserPage() {
                     setPlaces(data.places || []);
                     setSubscription(data.subscription || null);
                     setSubscriptions(data.subscriptions || []);
+                    setConsents(data.consents || []);
                 }
             } catch (error) {
                 if (isMounted) {
@@ -135,6 +138,8 @@ export function UserPage() {
             <div className="user-page-grid">
                 <div className="user-page-main">
                     <UserInfoCard title="Основная информация" items={mainInfo} />
+
+                    <UserConsents consents={consents} />
 
                     <UserPlaces places={places} />
                 </div>

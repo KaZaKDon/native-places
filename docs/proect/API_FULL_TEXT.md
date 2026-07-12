@@ -1119,12 +1119,27 @@ $input = json_decode(
     true
 );
 
+if (!is_array($input)) {
+    errorResponse('Некорректный JSON', 400);
+}
+
 $email = trim($input['email'] ?? '');
 $password = trim($input['password'] ?? '');
 $firstName = trim($input['first_name'] ?? '');
 $profileStatus = trim($input['profile_status'] ?? '');
 $phone = trim($input['phone'] ?? '');
 $telegram = trim($input['telegram'] ?? '');
+$acceptedTermsRaw = $input['accepted_terms'] ?? false;
+$acceptedPersonalDataRaw = $input['accepted_personal_data'] ?? false;
+$acceptedMarketingRaw = $input['accepted_marketing'] ?? false;
+
+$acceptedTerms = isTruthyConsentValue($acceptedTermsRaw);
+$acceptedPersonalData = isTruthyConsentValue($acceptedPersonalDataRaw);
+$acceptedMarketing = isTruthyConsentValue($acceptedMarketingRaw);
+
+$termsDocumentVersion = '1.0';
+$personalDataDocumentVersion = '1.0';
+$marketingDocumentVersion = '1.0';
 
 $errors = [];
 
@@ -1146,6 +1161,14 @@ if ($password === '') {
 
 if (mb_strlen($profileStatus) > 255) {
     $errors['profile_status'] = 'Статус не должен быть длиннее 255 символов';
+}
+
+if (!$acceptedTerms) {
+    $errors['accepted_terms'] = 'Необходимо принять правила сайта';
+}
+
+if (!$acceptedPersonalData) {
+    $errors['accepted_personal_data'] = 'Необходимо дать согласие на обработку персональных данных';
 }
 
 if (!empty($errors)) {
@@ -1175,6 +1198,11 @@ try {
     }
 
     $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+    $acceptedAt = (new DateTimeImmutable())->format('Y-m-d H:i:s');
+    $ipAddress = getClientIpAddress();
+    $userAgent = substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 512);
+
+    $pdo->beginTransaction();
 
     $insertStmt = $pdo->prepare("
         INSERT INTO users (
@@ -1211,6 +1239,57 @@ try {
 
     $userId = (int) $pdo->lastInsertId();
 
+    $consentStmt = $pdo->prepare("
+        INSERT INTO user_consents (
+            user_id,
+            consent_type,
+            document_version,
+            accepted_at,
+            ip_address,
+            user_agent,
+            created_at
+        ) VALUES (
+            :user_id,
+            :consent_type,
+            :document_version,
+            :accepted_at,
+            :ip_address,
+            :user_agent,
+            NOW()
+        )
+    ");
+
+    $consents = [
+        [
+            'type' => 'terms',
+            'document_version' => $termsDocumentVersion,
+        ],
+        [
+            'type' => 'personal_data',
+            'document_version' => $personalDataDocumentVersion,
+        ],
+    ];
+
+    if ($acceptedMarketing) {
+        $consents[] = [
+            'type' => 'marketing_emails',
+            'document_version' => $marketingDocumentVersion,
+        ];
+    }
+
+    foreach ($consents as $consent) {
+        $consentStmt->execute([
+            'user_id' => $userId,
+            'consent_type' => $consent['type'],
+            'document_version' => $consent['document_version'],
+            'accepted_at' => $acceptedAt,
+            'ip_address' => $ipAddress,
+            'user_agent' => $userAgent !== '' ? $userAgent : null,
+        ]);
+    }
+
+    $pdo->commit();
+
     successResponse([
         'message' => 'Пользователь успешно зарегистрирован',
         'user' => [
@@ -1221,13 +1300,47 @@ try {
             'profile_status' => $profileStatus !== '' ? $profileStatus : null,
             'phone' => $phone !== '' ? $phone : null,
             'telegram' => $telegram !== '' ? $telegram : null,
+            'accepted_terms' => true,
+            'accepted_personal_data' => true,
+            'accepted_marketing' => $acceptedMarketing,
+            'terms_document_version' => $termsDocumentVersion,
+            'personal_data_document_version' => $personalDataDocumentVersion,
+            'marketing_document_version' => $acceptedMarketing ? $marketingDocumentVersion : null,
+            'terms_accepted_at' => $acceptedAt,
+            'personal_data_accepted_at' => $acceptedAt,
+            'marketing_accepted_at' => $acceptedMarketing ? $acceptedAt : null,
             'status' => 'active',
         ],
     ], 201);
 } catch (Throwable $e) {
+    if (isset($pdo) && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+
     errorResponse('Не удалось выполнить регистрацию', 500, [
         'error' => $e->getMessage(),
     ]);
+}
+
+function isTruthyConsentValue($value): bool
+{
+    return in_array($value, [1, '1', true, 'true', 'on', 'yes'], true);
+}
+
+function getClientIpAddress(): ?string
+{
+    $rawIp = $_SERVER['HTTP_CF_CONNECTING_IP']
+        ?? $_SERVER['HTTP_X_FORWARDED_FOR']
+        ?? $_SERVER['REMOTE_ADDR']
+        ?? null;
+
+    if (!$rawIp) {
+        return null;
+    }
+
+    $ip = trim(explode(',', $rawIp)[0]);
+
+    return $ip !== '' ? substr($ip, 0, 45) : null;
 }
 
 

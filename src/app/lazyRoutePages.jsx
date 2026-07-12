@@ -52,6 +52,17 @@ export const SubmitPage = lazyNamedPage(
     () => import("../pages/SubmitPage"),
     "SubmitPage"
 );
+
+export const VerifyEmailPage = lazyNamedPage(
+    () => import("../pages/VerifyEmailPage"),
+    "VerifyEmailPage"
+);
+
+export const LegalPage = lazyNamedPage(
+    () => import("../pages/LegalPage"),
+    "LegalPage"
+);
+
 export const NotFoundPage = lazyNamedPage(
     () => import("../pages/NotFound/NotFoundPage"),
     "NotFoundPage"

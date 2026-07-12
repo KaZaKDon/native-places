@@ -23,7 +23,10 @@ export const authApi = {
         firstName,
         profileStatus,
         phone,
-        telegram
+        telegram,
+        acceptedTerms,
+        acceptedPersonalData,
+        acceptedMarketing,
     }) {
         return apiClient.post("/auth/register.php", {
             email,
@@ -32,6 +35,21 @@ export const authApi = {
             profile_status: profileStatus,
             phone,
             telegram,
+            accepted_terms: acceptedTerms,
+            accepted_personal_data: acceptedPersonalData,
+            accepted_marketing: acceptedMarketing,
+        });
+    },
+
+    verifyEmail(token) {
+        return apiClient.post("/auth/verify-email.php", {
+            token,
+        });
+    },
+
+    resendVerification(email) {
+        return apiClient.post("/auth/resend-verification.php", {
+            email,
         });
     },
 

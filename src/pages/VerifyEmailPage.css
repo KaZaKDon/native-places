@@ -1,0 +1,76 @@
+.verify-email-page {
+    display: grid;
+    min-height: 100vh;
+    place-items: center;
+    padding: 24px;
+    background:
+        linear-gradient(rgba(9, 17, 31, 0.72), rgba(9, 17, 31, 0.72)),
+        url("/images/auth/rostov-map-bg.webp") center / cover;
+}
+
+.verify-email-card {
+    width: min(100%, 460px);
+    padding: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 28px;
+    background: rgba(15, 23, 42, 0.94);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+    color: #f8fafc;
+    text-align: center;
+}
+
+.verify-email-card__eyebrow {
+    margin: 0 0 10px;
+    color: #e3b45f;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.verify-email-card h1 {
+    margin: 0 0 14px;
+    font-size: clamp(28px, 5vw, 40px);
+    line-height: 1.05;
+}
+
+.verify-email-card p {
+    margin: 0;
+    color: rgba(248, 250, 252, 0.82);
+    line-height: 1.6;
+}
+
+.verify-email-card__success {
+    color: #bbf7d0 !important;
+}
+
+.verify-email-card__error {
+    color: #fecdd3 !important;
+}
+
+.verify-email-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+.verify-email-card__actions a {
+    display: inline-flex;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 18px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #e3b45f, #f2d58a);
+    color: #111827;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.verify-email-card__actions a:last-child {
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: transparent;
+    color: #f8fafc;
+}
