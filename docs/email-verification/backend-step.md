@@ -34,7 +34,7 @@ api/shared/email-verification.php
 require_once __DIR__ . '/mailer.php';
 
 const EMAIL_VERIFICATION_TTL_HOURS = 24;
-const EMAIL_VERIFICATION_VERIFY_URL = 'https://native-places.ru/api/auth/verify-email.php';
+const EMAIL_VERIFICATION_FRONTEND_URL = 'https://native-places.ru/verify-email';
 
 function createEmailVerificationToken(PDO $pdo, int $userId, string $email): array
 {
@@ -92,9 +92,19 @@ function invalidatePendingEmailVerificationTokens(PDO $pdo, int $userId, string 
     ]);
 }
 
+
+function buildEmailVerificationFrontendUrl(string $token): string
+{
+    $frontendUrl = getenv('EMAIL_VERIFICATION_FRONTEND_URL') ?: EMAIL_VERIFICATION_FRONTEND_URL;
+    $frontendUrl = rtrim($frontendUrl, '?&');
+    $separator = strpos($frontendUrl, '?') !== false ? '&' : '?';
+
+    return $frontendUrl . $separator . 'token=' . urlencode($token);
+}
+
 function sendEmailVerificationEmail(string $email, string $firstName, string $token, string $expiresAt): array
 {
-    $verificationUrl = EMAIL_VERIFICATION_VERIFY_URL . '?token=' . urlencode($token);
+    $verificationUrl = buildEmailVerificationFrontendUrl($token);
     $safeName = htmlspecialchars($firstName !== '' ? $firstName : 'пользователь', ENT_QUOTES, 'UTF-8');
     $safeUrl = htmlspecialchars($verificationUrl, ENT_QUOTES, 'UTF-8');
 

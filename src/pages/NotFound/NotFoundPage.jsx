@@ -1,11 +1,19 @@
 import { Link, useNavigate } from "react-router-dom";
 
+import { Seo } from "../../shared/seo/Seo";
+
 import "./NotFoundPage.css";
 
 export function NotFoundPage() {
     const navigate = useNavigate();
 
     return (
+        <>
+            <Seo
+                title="Страница не найдена | Native Places"
+                description="Страница Native Places не найдена или была перемещена."
+                robots="noindex, nofollow"
+            />
         <section className="not-found-page">
             <div className="not-found-page__overlay" />
 
@@ -37,5 +45,6 @@ export function NotFoundPage() {
                 </div>
             </div>
         </section>
+        </>
     );
 }

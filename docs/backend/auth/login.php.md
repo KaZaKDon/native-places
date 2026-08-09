@@ -108,6 +108,7 @@ HTTP `200`
 - Если пользователь активен и пароль верный:
   - `$_SESSION['user_id'] = user.id`.
 - `password_hash` удаляется из массива пользователя перед ответом.
+Весь runtime-код endpoint-а должен быть внутри `try/catch`, включая `session_start()`, чтение JSON и приведение полей. Иначе TypeError/ошибка сессии до блока `try` может дать пустой HTTP 500 вместо JSON-ответа.
 
 ## PHP-код
 
@@ -118,39 +119,40 @@ require_once __DIR__ . '/../shared/cors.php';
 require_once __DIR__ . '/../shared/response.php';
 require_once __DIR__ . '/../config/database.php';
 
-session_start();
+try {
+    session_start();
 
-$input = json_decode(
+  $input = json_decode(
     file_get_contents('php://input'),
     true
-);
+  );
 
-if (!is_array($input)) {
+  if (!is_array($input)) {
     errorResponse('Некорректный JSON', 400);
-}
+  }
 
-$email = trim($input['email'] ?? '');
-$password = trim($input['password'] ?? '');
+  $email = trim((string) ($input['email'] ?? ''));
+  $password = trim((string) ($input['password'] ?? ''));
 
-$errors = [];
+  $errors = [];
 
-if ($email === '') {
-    $errors['email'] = 'Введите email';
-} elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $errors['email'] = 'Некорректный email';
-}
+  if ($email === '') {
+      $errors['email'] = 'Введите email';
+  } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+      $errors['email'] = 'Некорректный email';
+  }
 
-if ($password === '') {
-    $errors['password'] = 'Введите пароль';
-}
+  if ($password === '') {
+      $errors['password'] = 'Введите пароль';
+  }
 
-if (!empty($errors)) {
-    errorResponse('Ошибка валидации', 422, [
-        'errors' => $errors,
-    ]);
-}
+  if (!empty($errors)) {
+      errorResponse('Ошибка валидации', 422, [
+          'errors' => $errors,
+      ]);
+  }
 
-try {
+
     $pdo = getDatabaseConnection();
 
     $stmt = $pdo->prepare("

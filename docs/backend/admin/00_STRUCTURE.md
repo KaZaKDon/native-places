@@ -42,7 +42,15 @@ docs/backend/admin/
     preview.php.md
     index.php.md
     send.php.md
+    start.php.md
+    process.php.md
     delete.php.md
+
+  plans/
+    create.php.md
+    index.php.md
+    update.php.md
+    paid-test-tariff.md
 
   dictionaries/
     index.php.md
@@ -76,7 +84,13 @@ api/admin/
 | `api/admin/mailings/preview.php` | `docs/backend/admin/mailings/preview.php.md` |
 | `api/admin/mailings/index.php` | `docs/backend/admin/mailings/index.php.md` |
 | `api/admin/mailings/send.php` | `docs/backend/admin/mailings/send.php.md` |
+| `api/admin/mailings/start.php` | `docs/backend/admin/mailings/start.php.md` |
+| `api/admin/mailings/process.php` | `docs/backend/admin/mailings/process.php.md` |
 | `api/admin/mailings/delete.php` | `docs/backend/admin/mailings/delete.php.md` |
+| `api/admin/plans/index.php` | `docs/backend/admin/plans/index.php.md` |
+| `api/admin/plans/create.php` | `docs/backend/admin/plans/create.php.md` |
+| `api/admin/plans/update.php` | `docs/backend/admin/plans/update.php.md` |
+| тестовый платный тариф | `docs/backend/admin/plans/paid-test-tariff.md` |
 | `api/admin/dictionaries/index.php` | `docs/backend/admin/dictionaries/index.php.md` |
 | `api/admin/dictionaries/create-group.php` | `docs/backend/admin/dictionaries/create-group.php.md` |
 | `api/admin/dictionaries/update-group.php` | `docs/backend/admin/dictionaries/update-group.php.md` |

@@ -6,6 +6,7 @@ export function PlanForm({
     onChange,
     onSubmit,
     onCancel,
+    onApplyPaidTestPreset,
 }) {
     return (
         <form className="plan-form" onSubmit={onSubmit}>
@@ -29,6 +30,17 @@ export function PlanForm({
                         disabled={isSaving}
                     >
                         Отменить
+                    </button>
+                )}
+
+                {!isEditing && (
+                    <button
+                        className="plan-form__preset"
+                        type="button"
+                        onClick={onApplyPaidTestPreset}
+                        disabled={isSaving}
+                    >
+                        Заполнить тестовый платный
                     </button>
                 )}
             </div>

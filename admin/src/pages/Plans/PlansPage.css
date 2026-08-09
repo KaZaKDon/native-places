@@ -192,7 +192,8 @@
 }
 
 .plan-form__submit,
-.plan-form__cancel {
+.plan-form__cancel,
+.plan-form__preset {
     justify-self: start;
     min-height: 42px;
     padding: 0 16px;
@@ -210,12 +211,14 @@
 }
 
 .plan-form__submit:hover,
-.plan-form__cancel:hover {
+.plan-form__cancel:hover,
+.plan-form__preset:hover {
     transform: translateY(-1px);
     box-shadow: var(--shadow-card-hover);
 }
 
-.plan-form__cancel {
+.plan-form__cancel,
+.plan-form__preset {
     flex: 0 0 auto;
     align-self: flex-start;
     border-color: var(--color-border);
@@ -223,8 +226,14 @@
     color: var(--color-text);
 }
 
-.plan-form__cancel:hover {
+.plan-form__cancel:hover,
+.plan-form__preset:hover {
     border-color: var(--color-primary);
+    background: var(--color-soft-bg);
+    color: var(--color-primary);
+}
+
+.plan-form__preset {
     background: var(--color-soft-bg);
     color: var(--color-primary);
 }

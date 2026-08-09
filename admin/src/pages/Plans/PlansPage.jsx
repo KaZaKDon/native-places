@@ -18,6 +18,16 @@ const emptyPlanForm = {
     status: "active",
 };
 
+const paidTestPlanPreset = {
+    title: "Тестовый платный",
+    code: "paid_test_30",
+    description: "Тестовый тариф для проверки оплаты через Ю-Кассу: 1 объявление на 30 дней.",
+    price: "100",
+    durationDays: "30",
+    placesLimit: "1",
+    status: "active",
+};
+
 const planStatusItems = [
     { value: "active", title: "Активен" },
     { value: "disabled", title: "Отключён" },
@@ -101,6 +111,12 @@ export function PlansPage() {
     function resetForm() {
         setForm(emptyPlanForm);
         setEditingPlanId(null);
+    }
+
+    function handleApplyPaidTestPreset() {
+        setForm(paidTestPlanPreset);
+        setEditingPlanId(null);
+        setErrorMessage("");
     }
 
     function handleEdit(plan) {
@@ -226,6 +242,7 @@ export function PlansPage() {
                 onChange={handleFormChange}
                 onSubmit={handleSubmit}
                 onCancel={resetForm}
+                onApplyPaidTestPreset={handleApplyPaidTestPreset}
             />
         </section>
     );

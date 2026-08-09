@@ -1,11 +1,14 @@
 import { Helmet } from "react-helmet-async";
 
-export function Seo({ title, description, canonical, image, structuredData }) {
+export function Seo({ title, description, canonical, image, structuredData, robots }) {
+    const previewImage = image || "https://native-places.ru/images/logo/logo.png";
+
     return (
         <Helmet>
             <title>{title}</title>
 
             <meta name="description" content={description} />
+            {robots && <meta name="robots" content={robots} />}
 
             {canonical && <link rel="canonical" href={canonical} />}
 
@@ -15,9 +18,13 @@ export function Seo({ title, description, canonical, image, structuredData }) {
 
             {canonical && <meta property="og:url" content={canonical} />}
 
-            {image && <meta property="og:image" content={image} />}
+            <meta property="og:image" content={previewImage} />
 
             <meta property="og:site_name" content="Native Places" />
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:title" content={title} />
+            <meta name="twitter:description" content={description} />
+            <meta name="twitter:image" content={previewImage} />
 
             {structuredData && (
                 <script type="application/ld+json">

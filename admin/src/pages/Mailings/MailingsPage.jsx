@@ -52,6 +52,47 @@ export function MailingsPage() {
         await loadData();
     }
 
+
+    async function handleStart(mailing) {
+        const confirmed = window.confirm(
+            `Запустить рассылку «${mailing.subject}»? Письма начнут отправляться получателям.`
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            setIsLoading(true);
+            setErrorMessage("");
+
+            await mailingsApi.startMailing(mailing.id);
+            await mailingsApi.processMailing(mailing.id);
+
+            await loadData({ silent: true });
+        } catch (error) {
+            setErrorMessage(
+                error.message || "Не удалось запустить рассылку"
+            );
+            setIsLoading(false);
+        }
+    }
+
+    async function handleProcess(mailing) {
+        try {
+            setIsLoading(true);
+            setErrorMessage("");
+
+            await mailingsApi.processMailing(mailing.id);
+            await loadData({ silent: true });
+        } catch (error) {
+            setErrorMessage(
+                error.message || "Не удалось отправить пачку писем"
+            );
+            setIsLoading(false);
+        }
+    }
+
     async function handleDelete(mailing) {
         const confirmed = window.confirm(
             `Удалить черновик рассылки «${mailing.subject}»?`
@@ -117,6 +158,8 @@ export function MailingsPage() {
                     mailings={mailings}
                     isLoading={isLoading}
                     onDelete={handleDelete}
+                    onProcess={handleProcess}
+                    onStart={handleStart}
                 />
             ) : null}
 
@@ -125,6 +168,8 @@ export function MailingsPage() {
                     mailings={[]}
                     isLoading={isLoading}
                     onDelete={handleDelete}
+                    onProcess={handleProcess}
+                    onStart={handleStart}
                 />
             ) : null}
         </section>

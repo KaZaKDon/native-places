@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../shared/auth/useAuth";
+import { Seo } from "../shared/seo/Seo";
 
 import { AccountBook } from "../widgets/account-book";
 
@@ -42,6 +43,14 @@ export function AccountPage() {
     }
 
     return (
+        <>
+            <Seo
+                title="Личный кабинет | Native Places"
+                description="Личный кабинет пользователя Native Places."
+                canonical="https://native-places.ru/account"
+                robots="noindex, nofollow"
+            />
+
         <main className="account-page">
             <section className="account-page__hero">
                 <Link className="account-page__back" to="/">
@@ -59,5 +68,6 @@ export function AccountPage() {
                 <AccountBook />
             </section>
         </main>
+        </>
     );
 }

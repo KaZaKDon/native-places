@@ -25,7 +25,7 @@ function formatAudience(mailing) {
     return `${title}: ${mailing.audience_value}`;
 }
 
-export function MailingsTable({ mailings, isLoading, onDelete }) {
+export function MailingsTable({ mailings, isLoading, onDelete, onProcess, onStart }) {
     if (isLoading) {
         return (
             <EmptyState className="mailings-empty">
@@ -52,6 +52,8 @@ export function MailingsTable({ mailings, isLoading, onDelete }) {
                         <th>Тема</th>
                         <th>Аудитория</th>
                         <th>Получателей</th>
+                        <th>Отправлено</th>
+                        <th>Ошибок</th>
                         <th>Статус</th>
                         <th>Действия</th>
                     </tr>
@@ -79,6 +81,10 @@ export function MailingsTable({ mailings, isLoading, onDelete }) {
 
                                 <td>{mailing.recipients_count}</td>
 
+                                <td>{mailing.sent_count || 0}</td>
+
+                                <td>{mailing.failed_count || 0}</td>
+
                                 <td>
                                     <span className={`mailing-status mailing-status--${mailing.status}`}>
                                         {statusTitles[mailing.status] || mailing.status}
@@ -86,19 +92,43 @@ export function MailingsTable({ mailings, isLoading, onDelete }) {
                                 </td>
 
                                 <td>
-                                    {canDelete ? (
-                                        <button
-                                            className="mailings-table__delete"
-                                            type="button"
-                                            onClick={() => onDelete(mailing)}
-                                        >
-                                            Удалить
-                                        </button>
-                                    ) : (
-                                        <span className="mailings-table__muted">
-                                            Недоступно
-                                        </span>
-                                    )}
+                                    <div className="mailings-table__actions">
+                                        {mailing.status === "draft" ? (
+                                            <button
+                                                className="mailings-table__action"
+                                                type="button"
+                                                onClick={() => onStart(mailing)}
+                                            >
+                                                Отправить
+                                            </button>
+                                        ) : null}
+
+                                        {mailing.status === "sending" ? (
+                                            <button
+                                                className="mailings-table__action"
+                                                type="button"
+                                                onClick={() => onProcess(mailing)}
+                                            >
+                                                Отправить пачку
+                                            </button>
+                                        ) : null}
+
+                                        {canDelete ? (
+                                            <button
+                                                className="mailings-table__delete"
+                                                type="button"
+                                                onClick={() => onDelete(mailing)}
+                                            >
+                                                Удалить
+                                            </button>
+                                        ) : null}
+
+                                        {!canDelete && mailing.status !== "draft" && mailing.status !== "sending" ? (
+                                            <span className="mailings-table__muted">
+                                                Недоступно
+                                            </span>
+                                        ) : null}
+                                    </div>
                                 </td>
                             </tr>
                         );

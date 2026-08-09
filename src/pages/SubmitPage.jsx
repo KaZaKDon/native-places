@@ -7,6 +7,7 @@ import { useDebouncedValue } from "../shared/search/useDebouncedValue";
 import { myPlacesApi } from "../shared/api/myPlacesApi";
 import { paymentsApi } from "../shared/api/paymentsApi";
 import { submitOptionsApi } from "../shared/api/submitOptionsApi";
+import { Seo } from "../shared/seo/Seo";
 import {
     clearSubmitDraft,
     getSubmitDraft,
@@ -838,6 +839,13 @@ export function SubmitPage() {
     }
 
     return (
+        <>
+            <Seo
+                title={`${isEditMode ? "Редактировать место" : "Добавить место"} | Native Places`}
+                description="Форма добавления и редактирования места на Native Places."
+                canonical="https://native-places.ru/submit"
+                robots="noindex, nofollow"
+            />
         <main className="submit-page">
             <section className="submit-hero">
                 <div className="submit-hero__content">
@@ -1016,7 +1024,7 @@ export function SubmitPage() {
                         <section className="submit-form__section">
                             <h2>Тариф размещения</h2>
                             <p className="submit-form__note submit-form__note--top">
-                                На период запуска тарифы бесплатные. Выберите подходящий лимит — он нужен для срока размещения и количества объявлений.
+                                На период развития проекта тарифы доступны бесплатно на 3 - 4 месяца. После этого тариф один останется бесплатным, остальные бубут платными. По всем вопросам обращайтесь к администрации.
                             </p>
 
                             <div className="submit-plan-grid">
@@ -1310,5 +1318,6 @@ export function SubmitPage() {
                 </form>
             </section >
         </main >
+        </>
     );
 }

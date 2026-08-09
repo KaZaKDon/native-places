@@ -29,6 +29,23 @@ export const mailingsApi = {
         );
     },
 
+    startMailing(mailingId) {
+        return apiClient.post(
+            "/admin/mailings/start.php", {
+                mailing_id: mailingId,
+            }
+        );
+    },
+
+    processMailing(mailingId, limit = 25) {
+        return apiClient.post(
+            "/admin/mailings/process.php", {
+                mailing_id: mailingId,
+                limit,
+            }
+        );
+    },
+
     deleteMailing(mailingId) {
         return apiClient.post(
             "/admin/mailings/delete.php", {

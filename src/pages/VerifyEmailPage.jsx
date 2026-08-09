@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
 import { authApi } from "../shared/api/authApi";
+import { Seo } from "../shared/seo/Seo";
 
 import "./VerifyEmailPage.css";
 
@@ -49,6 +50,13 @@ export function VerifyEmailPage() {
     }, [token]);
 
     return (
+        <>
+            <Seo
+                title="Подтверждение email | Native Places"
+                description="Страница подтверждения email для аккаунта Native Places."
+                canonical="https://native-places.ru/verify-email"
+                robots="noindex, nofollow"
+            />
         <main className="verify-email-page">
             <section className="verify-email-card" aria-live="polite">
                 <p className="verify-email-card__eyebrow">Native Places</p>
@@ -77,5 +85,6 @@ export function VerifyEmailPage() {
                 </div>
             </section>
         </main>
+        </>
     );
 }

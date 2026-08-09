@@ -5,6 +5,7 @@ import { authApi } from "../shared/api/authApi";
 import { EyeIcon } from "../shared/icons/EyeIcon";
 import { EyeOffIcon } from "../shared/icons/EyeOffIcon";
 import { useAuth } from "../shared/auth/useAuth";
+import { Seo } from "../shared/seo/Seo";
 
 import "./AuthPage.css";
 
@@ -227,6 +228,13 @@ export function AuthPage() {
     }
 
     return (
+        <>
+            <Seo
+                title={`${title} | Native Places`}
+                description="Вход, регистрация и восстановление доступа к аккаунту Native Places."
+                canonical="https://native-places.ru/auth"
+                robots="noindex, nofollow"
+            />
         <main className="auth-page">
             <div className="auth-page__map" />
             <div className="auth-page__overlay" />
@@ -535,5 +543,6 @@ export function AuthPage() {
                 </nav>
             </section>
         </main>
+        </>
     );
 }

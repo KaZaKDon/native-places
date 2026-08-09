@@ -1,6 +1,13 @@
 {
-  "name": "Родные Места",
-  "short_name": "РМ",
+  "name": "Native Places",
+  "short_name": "Native Places",
+  "description": "Карта объявлений о недвижимости, аренде, базах отдыха, рыбалке, охоте и природных местах.",
+  "lang": "ru",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#b08a34",
+  "background_color": "#1d1d1d",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
@@ -12,8 +19,5 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ],
-  "theme_color": "#b08a34",
-  "background_color": "#1d1d1d",
-  "display": "standalone"
+  ]
 }

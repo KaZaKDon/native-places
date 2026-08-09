@@ -1,11 +1,16 @@
 import { Link, useLocation } from "react-router-dom";
 
+import { Seo } from "../shared/seo/Seo";
+
 import "./LegalPage.css";
 
 const LEGAL_PAGES = {
     rules: {
         eyebrow: "Правила Native Places",
         title: "Правила сайта",
+        path: "/rules",
+        seoTitle: "Правила сайта | Native Places",
+        seoDescription: "Правила размещения объявлений, общения и модерации на Native Places для безопасного каталога мест, маршрутов и объектов у природы.",
         intro: "Эти правила помогают сохранять каталог полезным, безопасным и удобным для путешественников, владельцев объектов и модераторов.",
         sections: [
             {
@@ -25,6 +30,9 @@ const LEGAL_PAGES = {
     privacy: {
         eyebrow: "Конфиденциальность",
         title: "Политика конфиденциальности",
+        path: "/privacy-policy",
+        seoTitle: "Политика конфиденциальности | Native Places",
+        seoDescription: "Политика конфиденциальности Native Places: какие данные используются для аккаунта, публикации объявлений, модерации и безопасности сервиса.",
         intro: "Мы собираем только те данные, которые нужны для работы аккаунта, публикации объявлений, связи с пользователями и безопасности сервиса.",
         sections: [
             {
@@ -44,6 +52,9 @@ const LEGAL_PAGES = {
     agreement: {
         eyebrow: "Пользовательское соглашение",
         title: "Пользовательское соглашение",
+        path: "/user-agreement",
+        seoTitle: "Пользовательское соглашение | Native Places",
+        seoDescription: "Пользовательское соглашение Native Places: условия использования сервиса, ответственность пользователей и правила размещения материалов.",
         intro: "Используя Native Places, пользователь соглашается соблюдать правила сайта и несёт ответственность за размещаемую информацию.",
         sections: [
             {
@@ -78,6 +89,12 @@ export function LegalPage({ type }) {
     const backPath = getBackPath(location.state);
 
     return (
+        <>
+            <Seo
+                title={page.seoTitle}
+                description={page.seoDescription}
+                canonical={`https://native-places.ru${page.path}`}
+            />
         <main className="legal-page">
             <section className="legal-card">
                 <nav className="legal-card__nav" aria-label="Юридические документы">
@@ -125,5 +142,6 @@ export function LegalPage({ type }) {
                 </div>
             </section>
         </main>
+        </>
     );
 }
