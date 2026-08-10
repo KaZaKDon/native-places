@@ -4,18 +4,15 @@
 
 | Поле | Значение |
 |---|---|
-| Backend на хосте | да |
-| Код сверено с хостом | да |
-| Источник | `docs/API_FULL_TEXT.md` |
-| Подключено на фронте | уточнить |
-| Нужны правки backend | нет |
-| Нужны правки frontend | уточнить |
+| Целевая версия backend | да |
+| Полный PHP-код | да |
+| Дата подготовки | 2026-08-09 |
+| Путь на хосте | `/www/native-places.ru/api/auth/me.php` |
+| Секреты в документе | нет |
 
 ## Назначение
 
-Endpoint возвращает текущего авторизованного пользователя по PHP-сессии.
-
-Используется для восстановления состояния авторизации после перезагрузки страницы.
+Возвращает текущего пользователя для восстановления авторизации после перезагрузки страницы.
 
 ## Метод и URL
 
@@ -23,89 +20,16 @@ Endpoint возвращает текущего авторизованного п
 GET /api/auth/me.php
 ```
 
-## Авторизация
+## Изменения этой версии
 
-Формально endpoint можно вызвать без авторизации.
+- Возвращает email_verified_at, который требуется AuthProvider на frontend.
+- Удаляет сессию неактивного или неподтверждённого пользователя.
 
-Если сессии нет, он вернёт:
+## Проверка после загрузки
 
-```json
-{
-  "authenticated": false,
-  "user": null
-}
-```
-
-## Request
-
-Тело запроса не требуется.
-
-Query-параметры не используются.
-
-## Success response
-
-### Пользователь авторизован
-
-HTTP `200`
-
-```json
-{
-  "success": true,
-  "data": {
-    "authenticated": true,
-    "user": {
-      "id": 1,
-      "role_id": 1,
-      "email": "user@example.com",
-      "first_name": "Иван",
-      "profile_status": "Путешественник",
-      "phone": "+79990000000",
-      "telegram": "@username",
-      "avatar": null,
-      "status": "active",
-      "role_code": "user",
-      "role_title": "Пользователь"
-    }
-  }
-}
-```
-
-### Пользователь не авторизован
-
-HTTP `200`
-
-```json
-{
-  "success": true,
-  "data": {
-    "authenticated": false,
-    "user": null
-  }
-}
-```
-
-## Error responses
-
-| HTTP | `message` | Причина |
-|---:|---|---|
-| `500` | `Не удалось получить текущего пользователя` | Неожиданная ошибка backend-а или базы данных. |
-
-## Frontend notes
-
-- Endpoint вызывать при старте приложения.
-- Для работы session cookie frontend должен отправлять credentials.
-- Если `authenticated = false`, пользователь не залогинен.
-- Если пользователь из сессии не найден или неактивен, backend уничтожает сессию и возвращает `authenticated = false`.
-- Endpoint не возвращает HTTP `401` при отсутствии сессии — это нормальное поведение.
-
-## Backend notes
-
-- Используются таблицы:
-  - `users`;
-  - `roles`.
-- ID пользователя берётся из:
-  - `$_SESSION['user_id']`.
-- Если пользователя нет или его статус не `active`, вызывается `session_destroy()`.
+1. Выполнить `php -l /www/native-places.ru/api/auth/me.php` или проверить синтаксис в панели хостинга.
+2. Выполнить связанный пользовательский сценарий по инструкции из архива.
+3. Не добавлять реальные пароли и персональные данные в этот документ.
 
 ## PHP-код
 
@@ -114,22 +38,24 @@ HTTP `200`
 
 require_once __DIR__ . '/../shared/cors.php';
 require_once __DIR__ . '/../shared/response.php';
+require_once __DIR__ . '/../shared/request.php';
+require_once __DIR__ . '/../shared/session.php';
 require_once __DIR__ . '/../config/database.php';
 
-session_start();
-
-$userId = $_SESSION['user_id'] ?? null;
-
-if (!$userId) {
-    successResponse([
-        'authenticated' => false,
-        'user' => null,
-    ]);
-}
-
 try {
-    $pdo = getDatabaseConnection();
+    requireHttpMethod('GET');
+    startAppSession();
 
+    $userId = $_SESSION['user_id'] ?? null;
+
+    if (!$userId) {
+        successResponse([
+            'authenticated' => false,
+            'user' => null,
+        ]);
+    }
+
+    $pdo = getDatabaseConnection();
     $stmt = $pdo->prepare("
         SELECT
             u.id,
@@ -137,17 +63,18 @@ try {
             u.email,
             u.first_name,
             u.profile_status,
+            u.last_name,
             u.phone,
             u.telegram,
             u.avatar,
             u.status,
-
+            u.is_email_verified,
+            u.email_verified_at,
+            u.last_login_at,
             r.code AS role_code,
             r.title AS role_title
-
         FROM users u
         INNER JOIN roles r ON r.id = u.role_id
-
         WHERE u.id = :id
         LIMIT 1
     ");
@@ -158,8 +85,8 @@ try {
 
     $user = $stmt->fetch();
 
-    if (!$user || $user['status'] !== 'active') {
-        session_destroy();
+    if (!$user || $user['status'] !== 'active' || empty($user['email_verified_at'])) {
+        destroyAppSession();
 
         successResponse([
             'authenticated' => false,
@@ -167,14 +94,15 @@ try {
         ]);
     }
 
+    $user['is_email_verified'] = 1;
+
     successResponse([
         'authenticated' => true,
         'user' => $user,
     ]);
 } catch (Throwable $e) {
-    errorResponse('Не удалось получить текущего пользователя', 500, [
-        'error' => $e->getMessage(),
-    ]);
+    error_log('[auth/me] ' . $e::class . ': ' . $e->getMessage());
+    errorResponse('Не удалось получить текущего пользователя', 500);
 }
 ```
 
@@ -182,4 +110,4 @@ try {
 
 | Дата | Изменение |
 |---|---|
-| 2026-07-04 | Документ структурирован из `docs/API_FULL_TEXT.md`. |
+| 2026-08-09 | Подготовлена исправленная полная версия по результатам сверки frontend, backend и структуры БД. |

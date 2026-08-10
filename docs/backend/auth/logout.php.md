@@ -4,18 +4,15 @@
 
 | Поле | Значение |
 |---|---|
-| Backend на хосте | да |
-| Код сверено с хостом | да |
-| Источник | `docs/API_FULL_TEXT.md` |
-| Подключено на фронте | уточнить |
-| Нужны правки backend | нет |
-| Нужны правки frontend | уточнить |
+| Целевая версия backend | да |
+| Полный PHP-код | да |
+| Дата подготовки | 2026-08-09 |
+| Путь на хосте | `/www/native-places.ru/api/auth/logout.php` |
+| Секреты в документе | нет |
 
 ## Назначение
 
-Endpoint завершает пользовательскую сессию.
-
-Очищает `$_SESSION`, удаляет session cookie и вызывает `session_destroy()`.
+Завершает пользовательскую сессию и удаляет session cookie.
 
 ## Метод и URL
 
@@ -23,87 +20,45 @@ Endpoint завершает пользовательскую сессию.
 POST /api/auth/logout.php
 ```
 
-## Авторизация
+## Изменения этой версии
 
-Формально можно вызвать без авторизации.
+- Использует единые функции startAppSession() и destroyAppSession().
 
-Если сессия есть, она будет очищена.
+## Проверка после загрузки
 
-## Request
-
-Тело запроса не требуется.
-
-## Success response
-
-HTTP `200`
-
-```json
-{
-  "success": true,
-  "data": {
-    "message": "Выход выполнен успешно",
-    "authenticated": false,
-    "user": null
-  }
-}
-```
-
-## Error responses
-
-Ожидаемых бизнес-ошибок нет.
-
-## Frontend notes
-
-- Endpoint используется для кнопки «Выйти».
-- После успешного ответа нужно очистить auth store на фронте.
-- После logout можно перенаправить пользователя на главную или страницу входа.
-- Для корректного удаления cookie frontend должен отправлять запрос с credentials.
-
-## Backend notes
-
-- Вызывается `session_start()`.
-- Затем:
-  - `$_SESSION = []`;
-  - удаляется session cookie;
-  - вызывается `session_destroy()`.
-- Возвращается `authenticated = false`.
+1. Выполнить `php -l /www/native-places.ru/api/auth/logout.php` или проверить синтаксис в панели хостинга.
+2. Выполнить связанный пользовательский сценарий по инструкции из архива.
+3. Не добавлять реальные пароли и персональные данные в этот документ.
 
 ## PHP-код
 
 ```php
 <?php
+
 require_once __DIR__ . '/../shared/cors.php';
 require_once __DIR__ . '/../shared/response.php';
+require_once __DIR__ . '/../shared/request.php';
+require_once __DIR__ . '/../shared/session.php';
 
-session_start();
+try {
+    requireHttpMethod('POST');
+    startAppSession();
+    destroyAppSession();
 
-$_SESSION = [];
-
-if (ini_get('session.use_cookies')) {
-    $params = session_get_cookie_params();
-
-    setcookie(
-        session_name(),
-        '',
-        time() - 42000,
-        $params['path'],
-        $params['domain'],
-        $params['secure'],
-        $params['httponly']
-    );
+    successResponse([
+        'message' => 'Выход выполнен успешно',
+        'authenticated' => false,
+        'user' => null,
+    ]);
+} catch (Throwable $e) {
+    error_log('[auth/logout] ' . $e::class . ': ' . $e->getMessage());
+    errorResponse('Не удалось завершить сессию', 500);
 }
 
-session_destroy();
-
-successResponse([
-    'message' => 'Выход выполнен успешно',
-    'authenticated' => false,
-    'user' => null,
-]);
 ```
 
 ## История изменений
 
 | Дата | Изменение |
 |---|---|
-| 2026-07-04 | Документ структурирован из `docs/API_FULL_TEXT.md`. |
+| 2026-08-09 | Подготовлена исправленная полная версия по результатам сверки frontend, backend и структуры БД. |

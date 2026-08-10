@@ -1,236 +1,139 @@
-# Структура Backend API Docs
+# Native Places Backend — фактическая структура
 
-Этот файл описывает целевую структуру документации backend API.
+Дата фиксации: 9 августа 2026 года
 
-Документация строится вокруг фактических PHP endpoint-ов, которые находятся на хосте. Каждый endpoint описывается отдельным Markdown-файлом с расширением `.php.md`.
+Этот файл описывает существующее дерево `docs/backend`, которое повторяет структуру `/api/` на хосте. Это не целевая схема и не предложение о будущей реорганизации.
 
-## Корневая структура
+## Корень
 
 ```text
 docs/backend/
-  00_STRUCTURE.md
-  README.md
-
-  shared/
-    response-format.md
-    auth-session.md
-    database.md
-    cors.md
-
-  public/
-    places/
-      create-options.php.md
-      featured.php.md
-      filters.php.md
-      index.php.md
-      map.php.md
-      search.php.md
-      show.php.md
-      validate.php.md
-    routes/
-      share.php.md
-
-  user/
-    auth/
-      register.php.md
-      login.php.md
-      logout.php.md
-      me.php.md
-    profile/
-      password.php.md
-    my-places/
-      create.php.md
-      delete.php.md
-      index.php.md
-      show.php.md
-      update.php.md
-    my-subscription/
-      current.php.md
-      change.php.md
-    conversations/
-      index.php.md
-      start.php.md
-    messages/
-      index.php.md
-      send.php.md
-
-  payments/
-    plans/
-      index.php.md
-    payments/
-      create.php.md
-      status.php.md
-      yookassa-webhook.php.md
-
-  admin/
-    00_STRUCTURE.md
-    shared/
-      require-admin.php.md
-    auth/
-      login-admin.php.md
-      login-code.php.md
-      me.php.md
-      logout.php.md
-    dashboard/
-      stats.php.md
-    settings/
-    dictionaries/
-    users/
-    teachers/
-    students/
-    teacher-documents/
+├── README.md
+├── 00_STRUCTURE.md
+├── auth-session.md
+├── response-format.md
+├── admin/
+├── appeals/
+├── auth/
+├── conversations/
+├── favorites/
+├── messages/
+├── my-places/
+├── my-subscription/
+├── notifications/
+├── payments/
+├── place-attributes/
+├── place-images/
+├── places/
+├── plans/
+├── profile/
+├── reports/
+├── reviews/
+├── routes/
+├── seo/
+└── shared/
 ```
 
-## Разделы
-
-### `shared/`
-
-Общие правила backend API:
-
-- формат JSON-ответов;
-- авторизация через PHP-сессии;
-- CORS;
-- подключение к базе данных;
-- общие helper-функции.
-
-### `public/`
-
-Публичные endpoint-ы, которые доступны без пользовательской авторизации.
-
-Примеры:
-
-- публичный список мест;
-- поиск;
-- карта;
-- фильтры;
-- публичная ссылка маршрута.
-
-### `user/`
-
-Endpoint-ы для обычного авторизованного пользователя.
-
-Примеры:
-
-- регистрация;
-- вход;
-- выход;
-- текущий пользователь;
-- профиль;
-- мои объявления;
-- моя подписка;
-- диалоги;
-- сообщения.
-
-### `payments/`
-
-Платёжный контур и тарифы.
-
-Примеры:
-
-- список тарифов;
-- создание платежа;
-- проверка статуса платежа;
-- webhook Ю-Кассы.
-
-### `admin/`
-
-Административный backend API.
-
-Примеры:
-
-- вход администратора;
-- проверка admin session;
-- dashboard;
-- управление пользователями;
-- словари;
-- настройки;
-- роли администратора и модератора.
-
-## Соответствие PHP endpoint-а и Markdown-файла
-
-Примеры соответствия:
-
-| PHP endpoint | Markdown-файл |
-|---|---|
-| `api/auth/login.php` | `docs/backend/user/auth/login.php.md` |
-| `api/auth/logout.php` | `docs/backend/user/auth/logout.php.md` |
-| `api/auth/me.php` | `docs/backend/user/auth/me.php.md` |
-| `api/places/index.php` | `docs/backend/public/places/index.php.md` |
-| `api/places/search.php` | `docs/backend/public/places/search.php.md` |
-| `api/my-places/create.php` | `docs/backend/user/my-places/create.php.md` |
-| `api/my-subscription/current.php` | `docs/backend/user/my-subscription/current.php.md` |
-| `api/plans/index.php` | `docs/backend/payments/plans/index.php.md` |
-| `api/payments/create.php` | `docs/backend/payments/payments/create.php.md` |
-| `api/admin/auth/login-admin.php` | `docs/backend/admin/auth/login-admin.php.md` |
-| `api/admin/shared/require-admin.php` | `docs/backend/admin/shared/require-admin.php.md` |
-
-## Стандарт endpoint-документа
-
-Каждый endpoint-файл должен содержать:
-
-1. Заголовок с реальным PHP-путём.
-2. Статус.
-3. Назначение.
-4. Метод и URL.
-5. Авторизацию.
-6. Request.
-7. Success response.
-8. Error responses.
-9. Frontend notes.
-10. Backend notes.
-11. PHP-код или актуальный фрагмент.
-12. Историю изменений.
-
-## Статус endpoint-а
-
-Рекомендуемый блок:
-
-```md
-## Статус
-
-| Поле | Значение |
-|---|---|
-| Backend на хосте | да |
-| Код сверено с хостом | да |
-| Источник | `php-after-changes/example.md` |
-| Подключено на фронте | уточнить |
-| Нужны правки backend | нет |
-| Нужны правки frontend | уточнить |
-```
-
-## Авторизация
-
-В документации используются такие типы авторизации:
-
-| Тип | Описание |
-|---|---|
-| Не требуется | Endpoint публичный. |
-| User session | Требуется авторизация обычного пользователя через PHP session. |
-| Admin session | Требуется авторизация администратора. |
-| Admin or moderator session | Требуется роль администратора или модератора. |
-
-## Формат ответов
-
-Общий формат описан в:
+## Пользовательский и публичный API
 
 ```text
-docs/backend/shared/response-format.md
+appeals/             2 документа
+auth/                4 документа
+conversations/       2 документа
+favorites/           3 документа
+messages/            2 документа
+my-places/           7 документов
+my-subscription/     2 документа
+notifications/       3 документа
+payments/            3 документа
+place-attributes/    3 документа
+place-images/        5 документов
+places/              9 документов
+plans/               1 документ
+profile/             4 документа
+reports/             2 документа
+reviews/             3 документа
+routes/              13 документов
+seo/                 1 документ
+shared/              5 документов
 ```
 
-## Авторизация и сессии
+Количество указывает текущее число Markdown-файлов в соответствующей папке и не является обещанием полноты API.
 
-Общие правила описаны в:
+## Admin API
 
 ```text
-docs/backend/shared/auth-session.md
+admin/
+├── README.md
+├── 00_STRUCTURE.md
+├── access-codes/
+├── appeals/
+├── attributes/
+├── auth/
+├── categories/
+├── dashboard/
+├── database/
+├── dictionaries/
+├── mailings/
+├── moderator-logs/
+├── payments/
+├── place-types/
+├── places/
+├── plans/
+├── reports/
+├── reviews/
+├── settings/
+├── shared/
+├── statistics/
+└── users/
 ```
 
-## Принцип обновления
+Подробности: `docs/backend/admin/00_STRUCTURE.md`.
 
-Если PHP-код на хосте меняется, нужно обновить соответствующий `.php.md` файл:
+## Соответствие путей
 
-1. Обновить request/response-контракт.
-2. Обновить backend notes.
-3. Обновить PHP-код или фрагмент.
-4. Обновить дату в истории изменений.
-5. Если нужно, отметить frontend-задачи.
+| Файл на хосте | Копия в проекте |
+|---|---|
+| `api/auth/register.php` | `docs/backend/auth/register.php.md` |
+| `api/auth/login.php` | `docs/backend/auth/login.php.md` |
+| `api/places/index.php` | `docs/backend/places/index.php.md` |
+| `api/my-places/create.php` | `docs/backend/my-places/create.php.md` |
+| `api/payments/create.php` | `docs/backend/payments/create.php.md` |
+| `api/routes/share.php` | `docs/backend/routes/share.php.md` |
+| `api/admin/users/show.php` | `docs/backend/admin/users/show.php.md` |
+| `api/admin/mailings/process.php` | `docs/backend/admin/mailings/process.php.md` |
+
+## Общие документы
+
+```text
+auth-session.md             описание пользовательской сессии
+response-format.md          общий формат JSON-ответов
+shared/auth.php.md          точная копия auth helper
+shared/cors.md              точная копия CORS helper в текущем имени документа
+shared/database.php.md      точная копия подключения к базе
+shared/response.php.md      точная копия response helper
+shared/database.md          пояснения по работе с базой
+```
+
+Названия `shared/cors.md` и `profile/password.md` пока оставлены как в полученном архиве. Их переименование относится к отдельному шагу и не выполняется в пунктах 7.1–7.2.
+
+## SEO и тестовый тариф
+
+Следующие файлы подтверждены как часть фактической копии с хоста и остаются на месте:
+
+```text
+seo/sitemap.php.md
+admin/plans/paid-test-tariff.md
+```
+
+## Правило актуализации
+
+После изменения PHP на хосте:
+
+1. обновляется полный код соответствующего `.php.md`;
+2. описание сверяется с кодом;
+3. фиксируется дата проверки;
+4. проверяется frontend/admin-вызов;
+5. обновляется история изменений.
+
+До пункта 7.3 инвентаризации endpoint-документы и их служебные шапки не изменяются.

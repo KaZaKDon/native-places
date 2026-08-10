@@ -1,210 +1,137 @@
-# Admin Backend API Structure
+# Native Places Admin Backend — фактическая структура
 
-Эта папка содержит структурированную документацию admin PHP API проекта Native Places.
+Дата фиксации: 9 августа 2026 года
 
-Admin API работает отдельно от пользовательского API и использует отдельную session-структуру:
+Этот файл перечисляет существующие документы в `docs/backend/admin`, соответствующие `/api/admin/` на хосте.
 
-```php
-$_SESSION['admin_user']
-```
-
-## Источники
-
-Основные исходные Markdown-файлы:
-
-```text
-admin/docs/native_places_admin_api_files.md
-admin/docs/dphp_corrected_code_archive.md
-admin/docs/api_php_review_log.md
-```
-
-## Базовая структура
+## Дерево
 
 ```text
 docs/backend/admin/
-  00_STRUCTURE.md
-
-  shared/
-    require-admin.php.md
-
-  auth/
-    login-admin.php.md
-    login-code.php.md
-    me.php.md
-    logout.php.md
-
-  settings/
-    index.php.md
-    update.php.md
-
-  mailings/
-    options.php.md
-    preview.php.md
-    index.php.md
-    send.php.md
-    start.php.md
-    process.php.md
-    delete.php.md
-
-  plans/
-    create.php.md
-    index.php.md
-    update.php.md
-    paid-test-tariff.md
-
-  dictionaries/
-    index.php.md
-    create-group.php.md
-    update-group.php.md
-    create-value.php.md
-    update-value.php.md
-    delete-value.php.md
+├── README.md
+├── 00_STRUCTURE.md
+├── access-codes/
+│   ├── create.php.md
+│   ├── disable.php.md
+│   └── index.php.md
+├── appeals/
+│   ├── index.php.md
+│   ├── show.php.md
+│   └── update.php.md
+├── attributes/
+│   ├── create.php.md
+│   ├── delete.php.md
+│   ├── index.php.md
+│   └── update.php.md
+├── auth/
+│   ├── login-admin.php.md
+│   ├── login-code.php.md
+│   ├── logout.php.md
+│   └── me.php.md
+├── categories/
+│   ├── create.php.md
+│   ├── index.php.md
+│   ├── toggle-active.php.md
+│   └── update.php.md
+├── dashboard/
+│   └── index.php.md
+├── database/
+│   └── admin-api-tables.md
+├── dictionaries/
+│   ├── create-group.php.md
+│   ├── create-value.php.md
+│   ├── delete-value.php.md
+│   ├── index.php.md
+│   ├── update-group.php.md
+│   └── update-value.php.md
+├── mailings/
+│   ├── delete.php.md
+│   ├── index.php.md
+│   ├── options.php.md
+│   ├── preview.php.md
+│   ├── process.php.md
+│   ├── send.php.md
+│   └── start.php.md
+├── moderator-logs/
+│   └── index.php.md
+├── payments/
+│   ├── index.php.md
+│   └── show.php.md
+├── place-types/
+│   ├── create.php.md
+│   ├── index.php.md
+│   ├── toggle-active.php.md
+│   └── update.php.md
+├── places/
+│   ├── archive.php.md
+│   ├── index.php.md
+│   ├── publish.php.md
+│   ├── reject.php.md
+│   └── show.php.md
+├── plans/
+│   ├── create.php.md
+│   ├── index.php.md
+│   ├── paid-test-tariff.md
+│   └── update.php.md
+├── reports/
+│   ├── close.php.md
+│   ├── index.php.md
+│   └── show.php.md
+├── reviews/
+│   ├── index.php.md
+│   ├── publish.php.md
+│   ├── reject.php.md
+│   └── show.php.md
+├── settings/
+│   ├── index.php.md
+│   └── update.php.md
+├── shared/
+│   ├── moderator-log.php.md
+│   └── require-admin.php.md
+├── statistics/
+│   └── index.php.md
+└── users/
+    ├── generate-moderator-code.php.md
+    ├── index.php.md
+    ├── make-moderator.php.md
+    ├── show.php.md
+    ├── update-role.php.md
+    ├── update-status.php.md
+    └── update-subscription.php.md
 ```
 
-## Реальные PHP paths
-
-Реальные backend-файлы находятся в структуре:
+## Соответствие путей
 
 ```text
-api/admin/
+api/admin/<раздел>/<файл>.php
+docs/backend/admin/<раздел>/<файл>.php.md
 ```
 
-Примеры соответствия:
+Примеры:
 
-| PHP endpoint | Документация |
+| Хост | Документ |
 |---|---|
-| `api/admin/shared/require-admin.php` | `docs/backend/admin/shared/require-admin.php.md` |
 | `api/admin/auth/login-admin.php` | `docs/backend/admin/auth/login-admin.php.md` |
-| `api/admin/auth/login-code.php` | `docs/backend/admin/auth/login-code.php.md` |
-| `api/admin/auth/me.php` | `docs/backend/admin/auth/me.php.md` |
-| `api/admin/auth/logout.php` | `docs/backend/admin/auth/logout.php.md` |
-| `api/admin/settings/index.php` | `docs/backend/admin/settings/index.php.md` |
-| `api/admin/settings/update.php` | `docs/backend/admin/settings/update.php.md` |
-| `api/admin/mailings/options.php` | `docs/backend/admin/mailings/options.php.md` |
-| `api/admin/mailings/preview.php` | `docs/backend/admin/mailings/preview.php.md` |
-| `api/admin/mailings/index.php` | `docs/backend/admin/mailings/index.php.md` |
-| `api/admin/mailings/send.php` | `docs/backend/admin/mailings/send.php.md` |
-| `api/admin/mailings/start.php` | `docs/backend/admin/mailings/start.php.md` |
+| `api/admin/places/publish.php` | `docs/backend/admin/places/publish.php.md` |
+| `api/admin/users/show.php` | `docs/backend/admin/users/show.php.md` |
 | `api/admin/mailings/process.php` | `docs/backend/admin/mailings/process.php.md` |
-| `api/admin/mailings/delete.php` | `docs/backend/admin/mailings/delete.php.md` |
-| `api/admin/plans/index.php` | `docs/backend/admin/plans/index.php.md` |
-| `api/admin/plans/create.php` | `docs/backend/admin/plans/create.php.md` |
-| `api/admin/plans/update.php` | `docs/backend/admin/plans/update.php.md` |
-| тестовый платный тариф | `docs/backend/admin/plans/paid-test-tariff.md` |
-| `api/admin/dictionaries/index.php` | `docs/backend/admin/dictionaries/index.php.md` |
-| `api/admin/dictionaries/create-group.php` | `docs/backend/admin/dictionaries/create-group.php.md` |
-| `api/admin/dictionaries/update-group.php` | `docs/backend/admin/dictionaries/update-group.php.md` |
-| `api/admin/dictionaries/create-value.php` | `docs/backend/admin/dictionaries/create-value.php.md` |
-| `api/admin/dictionaries/update-value.php` | `docs/backend/admin/dictionaries/update-value.php.md` |
-| `api/admin/dictionaries/delete-value.php` | `docs/backend/admin/dictionaries/delete-value.php.md` |
+| `api/admin/payments/show.php` | `docs/backend/admin/payments/show.php.md` |
 
-## Admin session
+## Доступ
 
-Admin API использует отдельную сессию:
+Общие серверные проверки находятся в:
 
-```php
-$_SESSION['admin_user']
+```text
+shared/require-admin.php.md
+shared/moderator-log.php.md
 ```
 
-Обычная пользовательская сессия:
+Конкретный уровень доступа определяется вызовом `requireAdmin()` или `requireAdminOrModerator()` в PHP-коде endpoint-а.
 
-```php
-$_SESSION['user_id']
-```
+## Правило структуры
 
-не считается admin-авторизацией.
-
-## Роли
-
-В admin API используются роли:
-
-| Роль | Описание |
-|---|---|
-| `admin` | Полный доступ к admin API. |
-| `moderator` | Ограниченный доступ к admin API. |
-
-## Helper-функции
-
-Основной helper:
-
-```php
-api/admin/shared/require-admin.php
-```
-
-Он предоставляет функции:
-
-```php
-getCurrentAdminUser()
-requireAdmin()
-requireAdminOrModerator()
-```
-
-## Типы доступа
-
-| Helper | Кто проходит |
-|---|---|
-| `requireAdmin()` | Только `admin`. |
-| `requireAdminOrModerator()` | `admin` и `moderator`. |
-
-## Стандарт endpoint-документа
-
-Каждый admin endpoint описывается по шаблону:
-
-```md
-# api/admin/path/file.php
-
-## Статус
-
-## Назначение
-
-## Метод и URL
-
-## Авторизация
-
-## Request
-
-## Success response
-
-## Error responses
-
-## Frontend notes
-
-## Backend notes
-
-## PHP-код
-
-## История изменений
-```
-
-## Статусы
-
-В каждом файле используется таблица:
-
-```md
-## Статус
-
-| Поле | Значение |
-|---|---|
-| Backend на хосте | да |
-| Код сверено с хостом | да |
-| Источник | `admin/docs/...` |
-| Подключено на фронте | уточнить |
-| Нужны правки backend | нет |
-| Нужны правки frontend | уточнить |
-```
-
-## Важное правило
-
-Если в Markdown-источниках нет полного PHP-кода endpoint-а, файл не заполняется выдуманным кодом.
-
-В таком случае нужно либо:
-
-1. найти код в другом источнике;
-2. взять код с хоста;
-3. временно сделать stub-документ со статусом `код не найден`.
-
-## История изменений
-
-| Дата | Изменение |
-|---|---|
-| 2026-07-04 | Добавлена структура admin backend docs. |
+- существующий документ не удаляется без проверки соответствующего файла на хосте;
+- новый файл на хосте добавляется в то же относительное место в `docs/backend/admin`;
+- файл-план не выдаётся за endpoint, но подтверждённые рабочие документы хоста сохраняются;
+- `plans/paid-test-tariff.md` остаётся в текущем разделе;
+- endpoint-документы не редактируются массово до пункта 7.3 инвентаризации.

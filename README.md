@@ -1,16 +1,118 @@
-# React + Vite
+# Native Places
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Native Places («Родные места») — каталог и карта мест, объектов, объявлений и пользовательских маршрутов. Проект состоит из публичного React-приложения, отдельной React-админки и PHP API на хосте `native-places.ru`.
 
-Currently, two official plugins are available:
+## Состав проекта
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```text
+src/                  исходный код публичного frontend
+public/               публичные изображения, favicon, robots.txt и sitemap
+admin/                отдельное приложение административной панели
+docs/backend/         точные копии PHP backend с хоста в формате .php.md
+docs/legal/           актуальная юридическая база и описание продукта
+docs/project/         текущее состояние, архитектура, планы и backlog
+dist/                 результат сборки публичного frontend
+admin/dist/           результат сборки админки
+```
 
-## React Compiler
+## Источники истины
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Публичный frontend: `src/**` и `public/**`.
+2. Админка: `admin/src/**` и `admin/public/**`.
+3. Backend: кодовые блоки в `docs/backend/**`, полученные с хоста. Один PHP-файл соответствует одному `.php.md` с тем же относительным путём.
+4. Юридические требования: `docs/legal/**`. До проверки юристом документы считаются рабочими редакциями.
+5. Текущее состояние и порядок доработок: `docs/project/CURRENT_STATE.md` и `docs/project/ROADMAP.md`.
 
-## Expanding the ESLint configuration
+Старые сводные выгрузки API не считаются источником истины, если они расходятся с `docs/backend/**`.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Технологии
+
+- React 19;
+- Vite 8;
+- React Router;
+- Leaflet и React Leaflet;
+- PHP 8.2;
+- MySQL/MariaDB;
+- cookie-based PHP sessions.
+
+## Локальный запуск публичного frontend
+
+```bash
+npm ci
+npm run dev
+```
+
+Vite проксирует запросы `/api` на `https://native-places.ru`. При необходимости другой адрес API задаётся во время сборки через `VITE_API_BASE_URL`.
+
+## Проверка публичного frontend
+
+```bash
+npm test
+npm run lint
+npm run build
+```
+
+## Локальный запуск админки
+
+```bash
+cd admin
+npm ci
+npm run dev
+```
+
+Админка собирается с базовым URL `/admin/`.
+
+Проверка:
+
+```bash
+npm run lint
+npm run build
+```
+
+## Правило работы с backend
+
+Backend физически работает на хосте. Изменение выполняется в таком порядке:
+
+1. Найти точную копию файла в `docs/backend`.
+2. Подготовить полную новую версию PHP-файла.
+3. Сделать резервную копию файла на хосте.
+4. Перенести новый PHP-код на хост.
+5. Проверить синтаксис, request/response и связанный frontend-сценарий.
+6. Обновить соответствующий `.php.md`.
+
+Endpoint-документы не удаляются только потому, что frontend сейчас их не вызывает: они могут использоваться админкой, cron-задачами, webhook или прямыми серверными сценариями.
+
+## Сборка и публикация
+
+Папки `dist/`, `admin/dist/` и `node_modules/` являются генерируемыми. Их не редактируют вручную.
+
+Перед выпуском:
+
+```bash
+npm ci
+npm test
+npm run lint
+npm run build
+
+cd admin
+npm ci
+npm run lint
+npm run build
+```
+
+Реальные секреты, пароли базы, ключи почты, ЮKassa и ККТ не должны попадать в Git, Markdown-документы или клиентские переменные `VITE_*`.
+
+## Текущий этап
+
+Проект проходит инвентаризацию и приведение документации к одному источнику истины. После неё последовательно выполняются:
+
+1. юридическая инфраструктура;
+2. безопасность backend;
+3. регистрация и подтверждение email;
+4. фиксация согласий;
+5. рекламные рассылки и отписка;
+6. тарифы и платежи;
+7. права пользователя;
+8. SEO и итоговый выпуск.
+
+Подробности: `docs/project/ROADMAP.md`.
