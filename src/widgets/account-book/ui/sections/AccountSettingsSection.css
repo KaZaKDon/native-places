@@ -35,6 +35,61 @@
     overflow: hidden;
 }
 
+.account-settings-legal {
+    display: grid;
+    gap: 14px;
+    min-width: 0;
+    margin-top: 18px;
+    padding: 16px;
+    border: 1px solid rgba(96, 65, 34, 0.14);
+    border-radius: 20px;
+    background: rgba(255, 248, 232, 0.2);
+}
+
+.account-settings-legal h2 {
+    margin: 4px 0 8px;
+    font-size: clamp(17px, 2.2vw, 20px);
+    line-height: 1.15;
+}
+
+.account-settings-legal > div > span {
+    color: rgba(60, 43, 28, 0.62);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.account-settings-legal p {
+    margin: 0;
+    color: rgba(60, 43, 28, 0.72);
+    line-height: 1.45;
+}
+
+.account-settings-legal nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.account-settings-legal a {
+    padding: 10px 12px;
+    border: 1px solid rgba(96, 65, 34, 0.14);
+    border-radius: 14px;
+    background: rgba(96, 65, 34, 0.08);
+    color: #3c2b1c;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.3;
+    text-decoration: none;
+}
+
+@media (max-width: 640px) {
+    .account-settings-legal nav {
+        grid-template-columns: 1fr;
+    }
+}
+
 .account-settings-notifications h2 {
     margin: 4px 0 0;
     max-width: 100%;

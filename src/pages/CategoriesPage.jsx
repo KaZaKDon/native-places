@@ -2,17 +2,47 @@ import { Link } from "react-router-dom";
 
 import { categoryCards } from "../shared/config/categoryConfig";
 import { Seo } from "../shared/seo/Seo";
+import {
+    SITE_URL,
+    createBreadcrumbStructuredData,
+} from "../shared/seo/seoConfig";
 
 import "./CategoriesPage.css";
 
 export function CategoriesPage() {
+    const structuredData = [
+        createBreadcrumbStructuredData([
+            { name: "Главная", path: "/" },
+            { name: "Категории", path: "/categories" },
+        ]),
+        {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "@id": `${SITE_URL}/categories#collection`,
+            name: "Категории Native Places",
+            url: `${SITE_URL}/categories`,
+            inLanguage: "ru-RU",
+            mainEntity: {
+                "@type": "ItemList",
+                itemListElement: categoryCards.map((category, index) => ({
+                    "@type": "ListItem",
+                    position: index + 1,
+                    name: category.title,
+                    url: `${SITE_URL}/category/${category.id}`,
+                })),
+            },
+        },
+    ];
+
     return (
         <>
             <Seo
-                title="Категории объявлений — недвижимость, аренда, отдых, рыбалка и охота | Native Places"
+                title="Категории мест и объявлений | Native Places"
                 description="Категории Native Places: недвижимость, аренда, базы отдыха, рыбалка, охота и природные места. Выберите направление, изучите объявления и откройте объекты на карте."
-                canonical="https://native-places.ru/categories"
-                image="https://native-places.ru/images/categories/categories-bg.webp"
+                canonical="/categories"
+                image="/images/categories/categories-bg.webp"
+                imageAlt="Категории мест и объявлений Native Places"
+                structuredData={structuredData}
             />
 
             <main className="categories-page">

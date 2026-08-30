@@ -385,6 +385,106 @@
     line-height: 1.65;
 }
 
+.place-page__contacts {
+    margin-top: 30px;
+    padding: 22px;
+
+    border: 1px solid rgba(244, 213, 141, 0.2);
+    border-radius: 24px;
+
+    background: rgba(244, 213, 141, 0.065);
+}
+
+.place-page__contacts-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.place-page__contacts-header .place-page__eyebrow {
+    margin-bottom: 8px;
+}
+
+.place-page__contacts-header h2 {
+    margin: 0;
+
+    color: rgba(255, 248, 232, 0.96);
+
+    font-size: clamp(22px, 2.4vw, 30px);
+    line-height: 1.15;
+}
+
+.place-page__contacts-header > span {
+    flex: 0 0 auto;
+
+    padding: 7px 10px;
+    border: 1px solid rgba(244, 213, 141, 0.22);
+    border-radius: 999px;
+
+    color: rgba(244, 213, 141, 0.84);
+
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.place-page__contacts-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+
+    margin: 20px 0 0;
+}
+
+.place-page__contact-row {
+    min-width: 0;
+
+    padding: 13px 14px;
+    border-radius: 16px;
+
+    background: rgba(255, 255, 255, 0.055);
+}
+
+.place-page__contact-row dt {
+    margin-bottom: 6px;
+
+    color: rgba(255, 248, 232, 0.54);
+
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.place-page__contact-row dd {
+    min-width: 0;
+    margin: 0;
+
+    overflow-wrap: anywhere;
+
+    color: rgba(255, 248, 232, 0.94);
+
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.place-page__contact-row a {
+    color: var(--color-gold-light);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+}
+
+.place-page__contacts-note {
+    margin: 16px 0 0;
+
+    color: rgba(255, 248, 232, 0.58);
+
+    font-size: 12px;
+    line-height: 1.5;
+}
+
 .place-page__tags {
     display: flex;
     flex-wrap: wrap;
@@ -1009,6 +1109,22 @@ img {
 }
 
 @media (max-width: 640px) {
+    .place-page__contacts {
+        padding: 18px;
+    }
+
+    .place-page__contacts-header {
+        display: grid;
+    }
+
+    .place-page__contacts-header > span {
+        justify-self: start;
+    }
+
+    .place-page__contacts-list {
+        grid-template-columns: 1fr;
+    }
+
     .place-page__summary {
         font-size: 16px;
     }

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
+import { getLegalAcceptancePayload } from "../content/legal/legalDocuments";
 import { localitiesApi } from "../shared/api/localitiesApi";
 import { validateSubmitForm } from "./submitFormValidation";
 import { useDebouncedValue } from "../shared/search/useDebouncedValue";
@@ -8,6 +9,7 @@ import { myPlacesApi } from "../shared/api/myPlacesApi";
 import { paymentsApi } from "../shared/api/paymentsApi";
 import { submitOptionsApi } from "../shared/api/submitOptionsApi";
 import { Seo } from "../shared/seo/Seo";
+import { NOINDEX_ROBOTS } from "../shared/seo/seoConfig";
 import {
     clearSubmitDraft,
     getSubmitDraft,
@@ -20,6 +22,7 @@ import {
 
 import "./SubmitPage.css";
 
+const PAID_SERVICES_ENABLED = import.meta.env.VITE_PAID_SERVICES_ENABLED === "true";
 
 function formatLocalityOption(locality) {
     if (!locality) {
@@ -36,19 +39,26 @@ function formatLocalityOption(locality) {
 }
 
 function getFormDataFromPlace(place) {
-    const contactValue =
-        place?.contact?.phone ||
-        place?.contact?.telegram ||
-        place?.contact?.email ||
-        "";
-
     return {
         title: place?.title ?? "",
         shortDescription: place?.shortDescription ?? place?.description ?? "",
         fullDescription: place?.fullDescription ?? "",
         address: place?.address ?? place?.locality ?? "",
         contactName: place?.contact?.name ?? "",
-        contactValue,
+        contactPhone: place?.contact?.phone ?? "",
+        contactEmail: place?.contact?.email ?? "",
+        contactTelegram: place?.contact?.telegram ?? "",
+    };
+}
+
+function getPublicationSettingsFromPlace(place) {
+    return {
+        contactName: Boolean(place?.publicationSettings?.contactName),
+        phone: Boolean(place?.publicationSettings?.phone),
+        email: Boolean(place?.publicationSettings?.email),
+        telegram: Boolean(place?.publicationSettings?.telegram),
+        address: Boolean(place?.publicationSettings?.address),
+        coordinates: place ? Boolean(place?.publicationSettings?.coordinates) : true,
     };
 }
 
@@ -110,40 +120,6 @@ function getPlanBadge(plan) {
     return "Платный";
 }
 
-function getContactFields(contactValue) {
-    const value = contactValue.trim();
-
-    if (!value) {
-        return {
-            phone: "",
-            telegram: "",
-            email: "",
-        };
-    }
-
-    if (value.includes("@") && !value.startsWith("@")) {
-        return {
-            phone: "",
-            telegram: "",
-            email: value,
-        };
-    }
-
-    if (value.startsWith("@") || value.toLowerCase().includes("t.me")) {
-        return {
-            phone: "",
-            telegram: value,
-            email: "",
-        };
-    }
-
-    return {
-        phone: value,
-        telegram: "",
-        email: "",
-    };
-}
-
 export function SubmitPage() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -197,6 +173,12 @@ export function SubmitPage() {
         return initialDraft?.formData ?? getFormDataFromPlace(null);
     });
 
+    const [publicationSettings, setPublicationSettings] = useState(() => {
+        return initialDraft?.publicationSettings ?? getPublicationSettingsFromPlace(null);
+    });
+
+    const [acceptedPublication, setAcceptedPublication] = useState(false);
+
     const [extraFields, setExtraFields] = useState(() => {
         return initialDraft?.extraFields ?? {};
     });
@@ -231,10 +213,6 @@ export function SubmitPage() {
 
                 setSubmitTypes(Array.isArray(data.types) ? data.types : []);
                 setSubmitPlans(normalizedPlans);
-
-                if (!editPlaceId && !initialDraft?.selectedPlan && normalizedPlans.length > 0) {
-                    setSelectedPlan(String(normalizedPlans[0].id));
-                }
 
                 setOptionsError("");
             } catch (error) {
@@ -353,6 +331,8 @@ export function SubmitPage() {
                     region: place.localityRegion || "",
                 }));
                 setFormData(getFormDataFromPlace(place));
+                setPublicationSettings(getPublicationSettingsFromPlace(place));
+                setAcceptedPublication(false);
                 setExtraFields(place.extraFields || {});
                 setGallery(Array.isArray(place.gallery) ? place.gallery : []);
             } catch (error) {
@@ -483,6 +463,7 @@ export function SubmitPage() {
             selectedLocality,
             localitySearch,
             formData,
+            publicationSettings,
             extraFields,
             gallery,
             updatedAt: new Date().toISOString(),
@@ -512,6 +493,34 @@ export function SubmitPage() {
             [name]: value,
         }));
 
+        const publicationFieldByInput = {
+            contactName: "contactName",
+            contactPhone: "phone",
+            contactEmail: "email",
+            contactTelegram: "telegram",
+            address: "address",
+        };
+        const publicationField = publicationFieldByInput[name];
+
+        if (publicationField && value.trim() === "") {
+            setPublicationSettings((currentSettings) => ({
+                ...currentSettings,
+                [publicationField]: false,
+            }));
+        }
+
+        setAcceptedPublication(false);
+        setSubmitStatus("");
+    }
+
+    function handlePublicationSettingChange(event) {
+        const { name, checked } = event.target;
+
+        setPublicationSettings((currentSettings) => ({
+            ...currentSettings,
+            [name]: checked,
+        }));
+        setAcceptedPublication(false);
         setSubmitStatus("");
     }
 
@@ -694,7 +703,25 @@ export function SubmitPage() {
             ? [submitLocation.lat, submitLocation.lng]
             : editingPlace.position;
 
-        const contactFields = getContactFields(formData.contactValue);
+        if (!acceptedPublication) {
+            setSubmitStatus(
+                "Подтвердите согласие на публикацию выбранных данных и соблюдение правил."
+            );
+            return;
+        }
+
+        const acceptedDocumentCodes = [
+            "publication_data_consent",
+            "content_rules",
+        ];
+
+        if (!isEditMode) {
+            acceptedDocumentCodes.push(
+                Number(selectedPlanItem?.price || 0) > 0
+                    ? "paid_services_offer"
+                    : "free_tariff_rules"
+            );
+        }
 
         setIsSubmitting(true);
         setSubmitStatus(
@@ -727,12 +754,18 @@ export function SubmitPage() {
                 latitude: position[0],
                 longitude: position[1],
                 contactName: formData.contactName.trim(),
-                phone: contactFields.phone,
-                telegram: contactFields.telegram,
-                email: contactFields.email,
+                phone: formData.contactPhone.trim(),
+                telegram: formData.contactTelegram.trim(),
+                email: formData.contactEmail.trim(),
                 website: editingPlace?.contact?.website || "",
                 bookingType: editingPlace?.bookingType || "phone",
                 bookingUrl: editingPlace?.bookingUrl || "",
+                publicationSettings,
+                legalAcceptance: {
+                    source: isEditMode ? "listing_update" : "listing_create",
+                    action: isEditMode ? "updated" : "accepted",
+                    documents: getLegalAcceptancePayload(acceptedDocumentCodes),
+                },
             });
 
             const attributes = attributeDefinitions.map((field) => ({
@@ -795,46 +828,62 @@ export function SubmitPage() {
 
     if (isFormBootstrapLoading) {
         return (
-            <main className="submit-page">
-                <section className="submit-hero">
-                    <div className="submit-hero__content">
-                        <Link className="submit-page__back" to="/account">
-                            ← В кабинет
-                        </Link>
+            <>
+                <Seo
+                    title="Форма объявления | Native Places"
+                    description="Форма добавления и редактирования места на Native Places."
+                    canonical="/submit"
+                    robots={NOINDEX_ROBOTS}
+                />
+                <main className="submit-page">
+                    <section className="submit-hero">
+                        <div className="submit-hero__content">
+                            <Link className="submit-page__back" to="/account">
+                                ← В кабинет
+                            </Link>
 
-                        <p className="submit-page__eyebrow">
-                            {editPlaceId ? "Редактирование" : "Добавление"}
-                        </p>
+                            <p className="submit-page__eyebrow">
+                                {editPlaceId ? "Редактирование" : "Добавление"}
+                            </p>
 
-                        <h1>Загружаем форму</h1>
+                            <h1>Загружаем форму</h1>
 
-                        <p className="submit-hero__lead">
-                            Получаем категории, типы объектов, населённые пункты
-                            и данные объявления.
-                        </p>
-                    </div>
-                </section>
-            </main>
+                            <p className="submit-hero__lead">
+                                Получаем категории, типы объектов, населённые пункты
+                                и данные объявления.
+                            </p>
+                        </div>
+                    </section>
+                </main>
+            </>
         );
     }
 
     if (editPlaceId && editingError) {
         return (
-            <main className="submit-page">
-                <section className="submit-hero">
-                    <div className="submit-hero__content">
-                        <Link className="submit-page__back" to="/account">
-                            ← В кабинет
-                        </Link>
+            <>
+                <Seo
+                    title="Объявление недоступно | Native Places"
+                    description="Не удалось открыть объявление для редактирования."
+                    canonical="/submit"
+                    robots={NOINDEX_ROBOTS}
+                />
+                <main className="submit-page">
+                    <section className="submit-hero">
+                        <div className="submit-hero__content">
+                            <Link className="submit-page__back" to="/account">
+                                ← В кабинет
+                            </Link>
 
-                        <p className="submit-page__eyebrow">Редактирование</p>
+                            <p className="submit-page__eyebrow">Редактирование</p>
 
-                        <h1>Не удалось открыть объявление</h1>
+                            <h1>Не удалось открыть объявление</h1>
 
-                        <p className="submit-hero__lead">{editingError}</p>
-                    </div>
-                </section>
-            </main>
+                            <p className="submit-hero__lead">{editingError}</p>
+                        </div>
+                    </section>
+                </main>
+            </>
         );
     }
 
@@ -843,8 +892,8 @@ export function SubmitPage() {
             <Seo
                 title={`${isEditMode ? "Редактировать место" : "Добавить место"} | Native Places`}
                 description="Форма добавления и редактирования места на Native Places."
-                canonical="https://native-places.ru/submit"
-                robots="noindex, nofollow"
+                canonical="/submit"
+                robots={NOINDEX_ROBOTS}
             />
         <main className="submit-page">
             <section className="submit-hero">
@@ -1024,7 +1073,12 @@ export function SubmitPage() {
                         <section className="submit-form__section">
                             <h2>Тариф размещения</h2>
                             <p className="submit-form__note submit-form__note--top">
-                                На период развития проекта тарифы доступны бесплатно на 3 - 4 месяца. После этого тариф один останется бесплатным, остальные бубут платными. По всем вопросам обращайтесь к администрации.
+                                На период развития проекта тарифы доступны бесплатно на 3–4 месяца. После этого один тариф останется бесплатным, остальные будут платными. Выберите подходящий тариф самостоятельно. По всем вопросам обращайтесь к администрации.
+                                {" "}
+                                <Link to="/legal/free-tariffs" target="_blank" rel="noreferrer">
+                                    Правила бесплатных тарифов
+                                </Link>
+                                .
                             </p>
 
                             <div className="submit-plan-grid">
@@ -1037,8 +1091,13 @@ export function SubmitPage() {
                                                 : "submit-plan"
                                         }
                                         type="button"
+                                        disabled={
+                                            Number(plan.price || 0) > 0 &&
+                                            !PAID_SERVICES_ENABLED
+                                        }
                                         onClick={() => {
                                             setSelectedPlan(String(plan.id));
+                                            setAcceptedPublication(false);
                                             setSubmitStatus("");
                                         }}
                                     >
@@ -1051,6 +1110,9 @@ export function SubmitPage() {
                                             До {Number(plan.max_places || 0) || "∞"} объявл. · {formatPlanDuration(plan.duration_days)}
                                         </small>
                                         <b>{formatPlanPrice(plan.price)}</b>
+                                        {Number(plan.price || 0) > 0 && !PAID_SERVICES_ENABLED && (
+                                            <em>После запуска оплаты</em>
+                                        )}
                                     </button>
                                 ))}
                             </div>
@@ -1182,7 +1244,7 @@ export function SubmitPage() {
                             </Link>
                         </div>
 
-                        <label className="submit-form__field">
+                        <label className="submit-form__field submit-form__field--photos">
                             <span>Фотографии</span>
 
                             <input
@@ -1263,6 +1325,11 @@ export function SubmitPage() {
                     <section className="submit-form__section">
                         <h2>Контакт для связи</h2>
 
+                        <p className="submit-form__note submit-form__note--top">
+                            Контактные данные сохраняются для этой карточки. Публично будут показаны
+                            только поля, которые вы отдельно разрешите ниже.
+                        </p>
+
                         <label className="submit-form__field">
                             <span>Имя</span>
                             <input
@@ -1275,15 +1342,155 @@ export function SubmitPage() {
                         </label>
 
                         <label className="submit-form__field">
-                            <span>Телефон или email</span>
+                            <span>Телефон</span>
                             <input
                                 type="text"
-                                name="contactValue"
-                                value={formData.contactValue}
-                                placeholder="Этот контакт не будет показан публично"
+                                name="contactPhone"
+                                value={formData.contactPhone}
+                                placeholder="Например, +7 900 000-00-00"
                                 onChange={handleFormChange}
                             />
                         </label>
+
+                        <label className="submit-form__field">
+                            <span>Email</span>
+                            <input
+                                type="email"
+                                name="contactEmail"
+                                value={formData.contactEmail}
+                                placeholder="contact@example.ru"
+                                onChange={handleFormChange}
+                            />
+                        </label>
+
+                        <label className="submit-form__field">
+                            <span>Telegram</span>
+                            <input
+                                type="text"
+                                name="contactTelegram"
+                                value={formData.contactTelegram}
+                                placeholder="@username или ссылка"
+                                onChange={handleFormChange}
+                            />
+                        </label>
+                    </section>
+
+                    <section className="submit-form__section submit-publication">
+                        <h2>Какие данные показывать публично</h2>
+
+                        <p className="submit-publication__warning">
+                            Публичные сведения увидят посетители и поисковые системы. Не указывайте
+                            чужие контакты и документы без законного основания.
+                        </p>
+
+                        <div className="submit-publication__choices">
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="contactName"
+                                    checked={publicationSettings.contactName}
+                                    disabled={!formData.contactName.trim()}
+                                    onChange={handlePublicationSettingChange}
+                                />
+                                <span>Показывать имя контактного лица</span>
+                            </label>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="phone"
+                                    checked={publicationSettings.phone}
+                                    disabled={!formData.contactPhone.trim()}
+                                    onChange={handlePublicationSettingChange}
+                                />
+                                <span>Показывать телефон</span>
+                            </label>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="email"
+                                    checked={publicationSettings.email}
+                                    disabled={!formData.contactEmail.trim()}
+                                    onChange={handlePublicationSettingChange}
+                                />
+                                <span>Показывать email</span>
+                            </label>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="telegram"
+                                    checked={publicationSettings.telegram}
+                                    disabled={!formData.contactTelegram.trim()}
+                                    onChange={handlePublicationSettingChange}
+                                />
+                                <span>Показывать Telegram</span>
+                            </label>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="address"
+                                    checked={publicationSettings.address}
+                                    disabled={!formData.address.trim()}
+                                    onChange={handlePublicationSettingChange}
+                                />
+                                <span>Показывать точный адрес</span>
+                            </label>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="coordinates"
+                                    checked={publicationSettings.coordinates}
+                                    onChange={handlePublicationSettingChange}
+                                />
+                                <span>Показывать точные координаты</span>
+                            </label>
+                        </div>
+
+                        <label className="submit-publication__acceptance">
+                            <input
+                                type="checkbox"
+                                checked={acceptedPublication}
+                                onChange={(event) => {
+                                    setAcceptedPublication(event.target.checked);
+                                    setSubmitStatus("");
+                                }}
+                                required
+                            />
+                            <span>
+                                Разрешаю публикацию только выбранных мной данных на условиях{" "}
+                                <Link to="/legal/publication-consent" target="_blank" rel="noreferrer">
+                                    отдельного согласия
+                                </Link>{" "}
+                                и принимаю{" "}
+                                <Link to="/legal/content-rules" target="_blank" rel="noreferrer">
+                                    правила размещения и модерации
+                                </Link>
+                                {!isEditMode && selectedPlanItem && (
+                                    <>
+                                        {", а также ознакомился с "}
+                                        <Link
+                                            to={Number(selectedPlanItem.price || 0) > 0
+                                                ? "/legal/paid-offer"
+                                                : "/legal/free-tariffs"}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            {Number(selectedPlanItem.price || 0) > 0
+                                                ? "условиями платной оферты"
+                                                : "правилами бесплатного тарифа"}
+                                        </Link>
+                                    </>
+                                )}
+                                .
+                            </span>
+                        </label>
+
+                        <p className="submit-form__note">
+                            Для коммерческих предложений также действуют{" "}
+                            <Link to="/legal/commercial-materials" target="_blank" rel="noreferrer">
+                                правила коммерческих материалов
+                            </Link>
+                            .
+                        </p>
                     </section>
 
                     {(optionsError || localitiesError) && (

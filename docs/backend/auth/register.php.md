@@ -218,6 +218,7 @@ try {
         'requires_email_verification' => true,
         'email' => $email,
         'verification_expires_at' => $verificationToken['expires_at'],
+        'resend_available_in_seconds' => getEmailVerificationResendCooldownSeconds(),
         'user' => [
             'id' => $userId,
             'role_id' => 1,
@@ -273,4 +274,5 @@ function getClientIpAddress(): ?string
 
 | Дата | Изменение |
 |---|---|
+| 2026-08-10 | В ответ добавлено серверное время ожидания до повторной отправки письма. |
 | 2026-08-09 | Подготовлена исправленная полная версия по результатам сверки frontend, backend и структуры БД. |

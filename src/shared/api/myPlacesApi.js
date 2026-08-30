@@ -41,6 +41,14 @@ function mapMyPlaceFromApi(place) {
             email: place.email || "",
             website: place.website || "",
         },
+        publicationSettings: {
+            contactName: Boolean(Number(place.show_contact_name || 0)),
+            phone: Boolean(Number(place.show_phone || 0)),
+            email: Boolean(Number(place.show_email || 0)),
+            telegram: Boolean(Number(place.show_telegram || 0)),
+            address: Boolean(Number(place.show_address || 0)),
+            coordinates: Boolean(Number(place.show_coordinates ?? 1)),
+        },
         createdAt: place.created_at || "",
         updatedAt: place.updated_at || "",
     };
@@ -163,6 +171,8 @@ export const myPlacesApi = {
         website,
         bookingType,
         bookingUrl,
+        publicationSettings,
+        legalAcceptance,
     }) {
         return apiClient.post("/my-places/update.php", {
             id,
@@ -180,6 +190,15 @@ export const myPlacesApi = {
             website,
             booking_type: bookingType,
             booking_url: bookingUrl,
+            publication_settings: {
+                contact_name: Boolean(publicationSettings?.contactName),
+                phone: Boolean(publicationSettings?.phone),
+                email: Boolean(publicationSettings?.email),
+                telegram: Boolean(publicationSettings?.telegram),
+                address: Boolean(publicationSettings?.address),
+                coordinates: Boolean(publicationSettings?.coordinates),
+            },
+            legal_acceptance: legalAcceptance,
         });
     },
 

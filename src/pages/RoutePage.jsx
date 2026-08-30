@@ -3,6 +3,8 @@ import { Link, useParams } from "react-router-dom";
 
 import { routesApi } from "../shared/api/routesApi";
 import { openYandexRouteFromCurrentLocation } from "../shared/map/openYandexRoute";
+import { Seo } from "../shared/seo/Seo";
+import { NOINDEX_ROBOTS } from "../shared/seo/seoConfig";
 
 import "./RoutePage.css";
 
@@ -13,6 +15,15 @@ export function RoutePage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [shareMessage, setShareMessage] = useState("");
+    const seo = (
+        <Seo
+            title={route?.title
+                ? `${route.title} — личный маршрут | Native Places`
+                : "Личный маршрут | Native Places"}
+            description="Личный маршрут пользователя Native Places."
+            robots={NOINDEX_ROBOTS}
+        />
+    );
 
     useEffect(() => {
         let isMounted = true;
@@ -73,27 +84,33 @@ export function RoutePage() {
 
     if (loading) {
         return (
-            <main className="route-page">
-                <section className="route-page__card">
-                    <p>Загружаем маршрут...</p>
-                </section>
-            </main>
+            <>
+                {seo}
+                <main className="route-page">
+                    <section className="route-page__card">
+                        <p>Загружаем маршрут...</p>
+                    </section>
+                </main>
+            </>
         );
     }
 
     if (error || !route) {
         return (
-            <main className="route-page">
-                <section className="route-page__card">
-                    <Link className="route-page__back" to="/account">
-                        ← В кабинет
-                    </Link>
+            <>
+                {seo}
+                <main className="route-page">
+                    <section className="route-page__card">
+                        <Link className="route-page__back" to="/account">
+                            ← В кабинет
+                        </Link>
 
-                    <h1>Маршрут не найден</h1>
+                        <h1>Маршрут не найден</h1>
 
-                    <p>{error || "Такого маршрута нет или доступ закрыт."}</p>
-                </section>
-            </main>
+                        <p>{error || "Такого маршрута нет или доступ закрыт."}</p>
+                    </section>
+                </main>
+            </>
         );
     }
 
@@ -145,7 +162,9 @@ export function RoutePage() {
     }
 
     return (
-        <main className="route-page">
+        <>
+            {seo}
+            <main className="route-page">
             <section className="route-page__card">
                 <Link className="route-page__back" to="/account">
                     ← В кабинет
@@ -256,6 +275,7 @@ export function RoutePage() {
                     </div>
                 )}
             </section>
-        </main>
+            </main>
+        </>
     );
 }

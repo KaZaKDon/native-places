@@ -1,0 +1,89 @@
+.internal-documents-page {
+    display: grid;
+    gap: 20px;
+}
+
+.internal-documents-page > header,
+.internal-documents-page > nav,
+.internal-documents-page > article {
+    padding: 24px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+}
+
+.internal-documents-page > header p {
+    margin: 0 0 6px;
+    color: var(--color-primary);
+    font-size: var(--font-size-xs);
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.internal-documents-page > header h2 {
+    margin: 0 0 8px;
+    font-size: clamp(26px, 4vw, 40px);
+}
+
+.internal-documents-page > header span {
+    color: var(--color-text-muted);
+}
+
+.internal-documents-page > nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.internal-documents-page > nav button {
+    min-height: 42px;
+    padding: 0 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    background: var(--color-soft-bg);
+    color: var(--color-text);
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.internal-documents-page > nav button.is-active {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: #fff;
+}
+
+.internal-documents-page > article {
+    color: var(--color-text-muted);
+    line-height: 1.7;
+}
+
+.internal-documents-page > article h1,
+.internal-documents-page > article h2,
+.internal-documents-page > article h3 {
+    color: var(--color-text);
+    line-height: 1.25;
+}
+
+.internal-documents-page > article h1 {
+    margin-top: 0;
+}
+
+.internal-documents-page > article table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.internal-documents-page > article th,
+.internal-documents-page > article td {
+    padding: 10px;
+    border: 1px solid var(--color-border);
+    text-align: left;
+    vertical-align: top;
+}
+
+@media (max-width: 720px) {
+    .internal-documents-page > article {
+        overflow-x: auto;
+    }
+}

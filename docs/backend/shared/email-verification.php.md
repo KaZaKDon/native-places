@@ -107,10 +107,18 @@ function invalidatePendingEmailVerificationTokens(PDO $pdo, int $userId, string 
     ]);
 }
 
+function getEmailVerificationResendCooldownSeconds(): int
+{
+    return max(
+        1,
+        (int) getAppConfig()['email_verification']['resend_cooldown_seconds']
+    );
+}
+
 function assertEmailVerificationResendAllowed(PDO $pdo, int $userId): void
 {
     $verificationConfig = getAppConfig()['email_verification'];
-    $cooldownSeconds = max(1, (int) $verificationConfig['resend_cooldown_seconds']);
+    $cooldownSeconds = getEmailVerificationResendCooldownSeconds();
     $dailyLimit = max(1, (int) $verificationConfig['daily_limit']);
 
     $stmt = $pdo->prepare("
@@ -188,11 +196,11 @@ function sendEmailVerificationEmail(
         'notify'
     );
 }
-
 ```
 
 ## История изменений
 
 | Дата | Изменение |
 |---|---|
+| 2026-08-10 | Добавлен единый getter cooldown для согласованной работы backend и таймера frontend. |
 | 2026-08-09 | Подготовлена исправленная полная версия по результатам сверки frontend, backend и структуры БД. |

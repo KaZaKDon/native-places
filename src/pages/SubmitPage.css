@@ -92,6 +92,19 @@
     font-weight: 700;
 }
 
+.submit-form__field--photos {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(244, 213, 141, 0.24);
+}
+
+.submit-form__field--photos > span {
+    color: #f4d58d;
+    font-size: clamp(17px, 2vw, 20px);
+    font-weight: 900;
+    letter-spacing: 0.01em;
+}
+
 .submit-form__field input,
 .submit-form__field select,
 .submit-form__field textarea {
@@ -465,6 +478,12 @@
     background: rgba(96, 126, 88, 0.14);
 }
 
+.submit-plan:disabled {
+    cursor: not-allowed;
+    opacity: 0.58;
+    transform: none;
+}
+
 .submit-plan.is-active {
     border-color: rgba(168, 202, 150, 0.5);
     background:
@@ -501,6 +520,81 @@
     align-self: end;
     color: #f6f3ea;
     font-size: 20px;
+}
+
+.submit-plan em {
+    color: rgba(255, 248, 232, 0.62);
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 800;
+}
+
+.submit-form__note a,
+.submit-publication a {
+    color: var(--color-gold-light);
+    text-underline-offset: 3px;
+}
+
+.submit-publication__warning {
+    margin: 0 0 20px;
+    padding: 15px 17px;
+
+    border: 1px solid rgba(var(--color-gold-rgb), 0.28);
+    border-radius: 18px;
+    background: rgba(var(--color-gold-rgb), 0.1);
+
+    color: rgba(255, 248, 232, 0.78);
+    line-height: 1.55;
+}
+
+.submit-publication__choices {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.submit-publication__choices label,
+.submit-publication__acceptance {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+
+    color: rgba(255, 248, 232, 0.82);
+    line-height: 1.5;
+}
+
+.submit-publication__choices label {
+    padding: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.submit-publication__choices input,
+.submit-publication__acceptance input {
+    width: 18px;
+    height: 18px;
+    margin: 2px 0 0;
+    flex: 0 0 auto;
+    accent-color: var(--color-gold);
+}
+
+.submit-publication__choices label:has(input:disabled) {
+    opacity: 0.46;
+}
+
+.submit-publication__acceptance {
+    margin-top: 22px;
+    padding: 17px;
+    border: 1px solid rgba(168, 202, 150, 0.3);
+    border-radius: 18px;
+    background: rgba(96, 126, 88, 0.12);
+}
+
+@media (max-width: 640px) {
+    .submit-publication__choices {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 900px) {

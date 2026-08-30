@@ -212,6 +212,7 @@ export function ReviewPage() {
 
                         <div className="review-actions">
                             <button
+                                className="review-action review-action--publish"
                                 type="button"
                                 onClick={handlePublish}
                                 disabled={isActionLoading || review.status === "published"}
@@ -220,6 +221,7 @@ export function ReviewPage() {
                             </button>
 
                             <button
+                                className="review-action review-action--reject"
                                 type="button"
                                 onClick={handleReject}
                                 disabled={isActionLoading || review.status === "rejected"}

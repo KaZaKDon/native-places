@@ -3,6 +3,8 @@ import { Link, useParams } from "react-router-dom";
 
 import { routesApi } from "../shared/api/routesApi";
 import { openYandexRouteFromCurrentLocation } from "../shared/map/openYandexRoute";
+import { Seo } from "../shared/seo/Seo";
+import { NOINDEX_FOLLOW_ROBOTS } from "../shared/seo/seoConfig";
 
 import "./RoutePage.css";
 
@@ -11,6 +13,17 @@ export function SharedRoutePage() {
 
     const [route, setRoute] = useState(null);
     const [error, setError] = useState("");
+    const seo = (
+        <Seo
+            title={route?.title
+                ? `${route.title} — маршрут | Native Places`
+                : "Публичный маршрут | Native Places"}
+            description={route?.description ||
+                "Маршрут по интересным местам, составленный пользователем Native Places."}
+            canonical={`/routes/share/${token}`}
+            robots={NOINDEX_FOLLOW_ROBOTS}
+        />
+    );
 
     useEffect(() => {
         let isMounted = true;
@@ -44,32 +57,40 @@ export function SharedRoutePage() {
 
     if (error) {
         return (
-            <main className="route-page">
-                <section className="route-page__card">
-                    <Link className="route-page__back" to="/">
-                        ← На главную
-                    </Link>
+            <>
+                {seo}
+                <main className="route-page">
+                    <section className="route-page__card">
+                        <Link className="route-page__back" to="/">
+                            ← На главную
+                        </Link>
 
-                    <h1>Маршрут не найден</h1>
+                        <h1>Маршрут не найден</h1>
 
-                    <p>{error}</p>
-                </section>
-            </main>
+                        <p>{error}</p>
+                    </section>
+                </main>
+            </>
         );
     }
 
     if (!route) {
         return (
-            <main className="route-page">
-                <section className="route-page__card">
-                    <p>Загружаем маршрут...</p>
-                </section>
-            </main>
+            <>
+                {seo}
+                <main className="route-page">
+                    <section className="route-page__card">
+                        <p>Загружаем маршрут...</p>
+                    </section>
+                </main>
+            </>
         );
     }
 
     return (
-        <main className="route-page">
+        <>
+            {seo}
+            <main className="route-page">
             <section className="route-page__card">
                 <Link className="route-page__back" to="/">
                     ← На главную
@@ -152,6 +173,7 @@ export function SharedRoutePage() {
                     </div>
                 )}
             </section>
-        </main>
+            </main>
+        </>
     );
 }

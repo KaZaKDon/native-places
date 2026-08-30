@@ -1,23 +1,34 @@
-# Файлы шага 3
+# Изменённые файлы
 
-## Выполнить последовательно
-
-```text
-sql/00_PRECHECK.sql
-sql/01_MIGRATION.sql
-sql/02_VERIFY.sql
-```
-
-## Только для аварийного отката
+## Frontend
 
 ```text
-sql/03_ROLLBACK.sql
+src/pages/AuthPage.jsx
+src/pages/VerifyEmailPage.jsx
+src/pages/VerifyEmailPage.css
 ```
 
-## Добавить в документацию проекта после успешной проверки
+## Backend на хосте
 
 ```text
-docs/project/database/2026-08-09-auth-schema-migration.md
+/www/native-places.ru/api/shared/email-verification.php
+/www/native-places.ru/api/auth/register.php
+/www/native-places.ru/api/auth/resend-verification.php
 ```
 
-PHP и frontend на этом шаге не заменяются.
+## Документация
+
+```text
+docs/backend/shared/email-verification.php.md
+docs/backend/auth/register.php.md
+docs/backend/auth/resend-verification.php.md
+```
+
+## Проверки
+
+```text
+ESLint: успешно
+Node tests: 17 из 17 успешно
+Vite production build: успешно
+PHP lint локально: не запускался, PHP CLI отсутствует в рабочем окружении
+```

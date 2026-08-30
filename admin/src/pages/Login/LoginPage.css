@@ -45,20 +45,64 @@
     gap: 8px;
 }
 
-.login-field span {
+.login-field span,
+.login-field > label {
     font-size: 14px;
     font-weight: 700;
 }
 
-.login-field input {
+.login-field input,
+.login-password-toggle {
     height: 44px;
+
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+}
+
+.login-field input {
+    width: 100%;
 
     padding: 0 12px;
 
-    border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
+}
 
-    background: var(--color-bg);
+.login-password-field {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.login-password-field input {
+    border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+
+.login-password-toggle {
+    min-width: 94px;
+    padding: 0 12px;
+    border-left: 0;
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    color: var(--color-primary);
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.login-password-toggle:hover,
+.login-password-toggle:focus-visible {
+    background: var(--color-soft-bg);
+}
+
+.login-forgot-link {
+    width: fit-content;
+    margin-top: -6px;
+    color: var(--color-primary);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.login-forgot-link:hover,
+.login-forgot-link:focus-visible {
+    text-decoration: underline;
 }
 
 .login-submit {

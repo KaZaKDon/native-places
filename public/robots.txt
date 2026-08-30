@@ -2,11 +2,10 @@ User-agent: *
 
 Allow: /
 
-Disallow: /auth
-Disallow: /account
-Disallow: /submit
-Disallow: /submit/location
+Disallow: /api/
 Disallow: /admin
-Disallow: /routes/
+
+Clean-param: category&place /map
 
 Sitemap: https://native-places.ru/sitemap.xml
+Host: native-places.ru

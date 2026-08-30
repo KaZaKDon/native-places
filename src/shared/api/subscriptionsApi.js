@@ -37,9 +37,10 @@ export const subscriptionsApi = {
         return normalizeSubscriptionPayload(data);
     },
 
-    async changeSubscription(planId) {
+    async changeSubscription(planId, legalAcceptance) {
         const data = await apiClient.post("/my-subscription/change.php", {
             plan_id: planId,
+            legal_acceptance: legalAcceptance,
         });
 
         return {

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../shared/auth/useAuth";
 import { Seo } from "../shared/seo/Seo";
+import { NOINDEX_ROBOTS } from "../shared/seo/seoConfig";
 
 import { AccountBook } from "../widgets/account-book";
 
@@ -30,11 +31,19 @@ export function AccountPage() {
 
     if (authLoading) {
         return (
-            <main className="account-page">
-                <section className="account-page__hero">
-                    <p className="account-page__loading">Проверяем вход...</p>
-                </section>
-            </main>
+            <>
+                <Seo
+                    title="Личный кабинет | Native Places"
+                    description="Личный кабинет пользователя Native Places."
+                    canonical="/account"
+                    robots={NOINDEX_ROBOTS}
+                />
+                <main className="account-page">
+                    <section className="account-page__hero">
+                        <p className="account-page__loading">Проверяем вход...</p>
+                    </section>
+                </main>
+            </>
         );
     }
 
@@ -47,8 +56,8 @@ export function AccountPage() {
             <Seo
                 title="Личный кабинет | Native Places"
                 description="Личный кабинет пользователя Native Places."
-                canonical="https://native-places.ru/account"
-                robots="noindex, nofollow"
+                canonical="/account"
+                robots={NOINDEX_ROBOTS}
             />
 
         <main className="account-page">

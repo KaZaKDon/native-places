@@ -5,10 +5,13 @@ import { placesApi } from "../shared/api/placesApi";
 import { categoryCards } from "../shared/config/categoryConfig";
 import { createMapCategorySearchParams } from "../shared/map/categoryUrl";
 import { Seo } from "../shared/seo/Seo";
+import {
+    NOINDEX_ROBOTS,
+    SITE_URL,
+    createBreadcrumbStructuredData,
+} from "../shared/seo/seoConfig";
 
 import "./CategoryPage.css";
-
-const SITE_URL = "https://native-places.ru";
 
 const CATEGORY_SEO = {
     "real-estate": {
@@ -152,6 +155,7 @@ export function CategoryPage() {
                     description="Запрошенная категория объявлений не найдена на Native Places."
                     canonical={`${SITE_URL}/categories`}
                     image={`${SITE_URL}/images/logo/logo.png`}
+                    robots={NOINDEX_ROBOTS}
                 />
 
                 <main className="category-page">
@@ -167,6 +171,33 @@ export function CategoryPage() {
         );
     }
 
+    const categoryStructuredData = [
+        createBreadcrumbStructuredData([
+            { name: "Главная", path: "/" },
+            { name: "Категории", path: "/categories" },
+            { name: seo.h1, path: `/category/${category.id}` },
+        ]),
+        {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "@id": `${SITE_URL}/category/${category.id}#collection`,
+            name: seo.h1,
+            description: seo.description,
+            url: `${SITE_URL}/category/${category.id}`,
+            inLanguage: "ru-RU",
+            mainEntity: {
+                "@type": "ItemList",
+                numberOfItems: places.length,
+                itemListElement: places.map((place, index) => ({
+                    "@type": "ListItem",
+                    position: index + 1,
+                    name: place.title,
+                    url: `${SITE_URL}/place/${place.slug}`,
+                })),
+            },
+        },
+    ];
+
     return (
         <>
             <Seo
@@ -174,6 +205,8 @@ export function CategoryPage() {
                 description={seo.description}
                 canonical={`${SITE_URL}/category/${category.id}`}
                 image={`${SITE_URL}/images/categories/cards/${category.id}.webp`}
+                imageAlt={`${seo.h1} — категория Native Places`}
+                structuredData={categoryStructuredData}
             />
 
             <main className={`category-page category-page--${category.id}`}>

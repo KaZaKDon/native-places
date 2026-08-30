@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import { RequireAuth } from "../components/RequireAuth/RequireAuth.jsx";
@@ -33,6 +34,12 @@ import { StatisticsPage } from "../pages/Statistics/StatisticsPage.jsx";
 import { ModeratorLogsPage } from "../pages/ModeratorLogs/ModeratorLogsPage.jsx";
 import { SettingsPage } from "../pages/Settings/SettingsPage.jsx";
 import { NotFoundPage } from "../pages/NotFound/NotFoundPage.jsx";
+
+const InternalDocumentsPage = lazy(() =>
+    import("../pages/InternalDocuments/InternalDocumentsPage.jsx").then((module) => ({
+        default: module.InternalDocumentsPage,
+    }))
+);
 
 import { AppealsPage } from "../pages/Appeals/AppealsPage.jsx";
 import { AppealPage } from "../pages/Appeal/AppealPage.jsx";
@@ -101,6 +108,15 @@ const serviceRoutes = [
     { path: "statistics", element: <StatisticsPage />, roles: MODERATION_ROLES },
     { path: "moderator-logs", element: <ModeratorLogsPage />, roles: ADMIN_ROLES },
     { path: "settings", element: <SettingsPage />, roles: ADMIN_ROLES },
+    {
+        path: "internal-documents",
+        element: (
+            <Suspense fallback={<p>Загружаем регламенты...</p>}>
+                <InternalDocumentsPage />
+            </Suspense>
+        ),
+        roles: MODERATION_ROLES,
+    },
 ];
 
 const adminRoutes = [

@@ -4,6 +4,12 @@ import { Link, useParams } from "react-router-dom";
 import { getPlaceBySlug } from "../shared/api/placesApi";
 import { createPlaceMapUrl } from "../entities/place/lib/createPlaceMapUrl";
 import { createPlaceRouteUrl } from "../entities/place/lib/createPlaceRouteUrl";
+import {
+    createEmailHref,
+    createPhoneHref,
+    createTelegramHref,
+    createWebsiteHref,
+} from "../entities/place/lib/createContactLinks";
 import { getPlaceImages } from "../entities/place/lib/getPlaceImages";
 import { conversationsApi } from "../shared/api/conversationsApi";
 import { favoritesApi } from "../shared/api/favoritesApi";
@@ -13,6 +19,12 @@ import { useAuth } from "../shared/auth/useAuth";
 import { AddToRouteModal } from "../features/routes/AddToRouteModal";
 
 import { Seo } from "../shared/seo/Seo";
+import {
+    NOINDEX_ROBOTS,
+    SITE_URL,
+    createBreadcrumbStructuredData,
+    toAbsoluteSiteUrl,
+} from "../shared/seo/seoConfig";
 import "./PlacePage.css";
 
 const PRIMARY_ATTRIBUTE_CODES = ["price", "area", "land_area", "rooms"];
@@ -414,32 +426,48 @@ export function PlacePage() {
 
     if (placeLoading) {
         return (
-            <main className="place-page place-page--not-found">
-                <section className="place-page__not-found">
-                    <p className="place-page__eyebrow">Загрузка</p>
-                    <h1>Загружаем объект</h1>
-                    <p>Получаем данные из базы.</p>
-                </section>
-            </main>
+            <>
+                <Seo
+                    title="Загрузка места | Native Places"
+                    description="Загружаем информацию о месте на Native Places."
+                    canonical={`/place/${slug}`}
+                    robots={NOINDEX_ROBOTS}
+                />
+                <main className="place-page place-page--not-found">
+                    <section className="place-page__not-found">
+                        <p className="place-page__eyebrow">Загрузка</p>
+                        <h1>Загружаем объект</h1>
+                        <p>Получаем данные из базы.</p>
+                    </section>
+                </main>
+            </>
         );
     }
 
     if (!place) {
         return (
-            <main className="place-page place-page--not-found">
-                <section className="place-page__not-found">
-                    <p className="place-page__eyebrow">Место не найдено</p>
-                    <h1>Такого объекта пока нет</h1>
-                    <p>
-                        {placeError ||
-                            "Возможно, ссылка устарела или объект еще не добавлен в базу."}
-                    </p>
+            <>
+                <Seo
+                    title="Место не найдено | Native Places"
+                    description="Запрошенное место не найдено или больше не опубликовано на Native Places."
+                    canonical={`/place/${slug}`}
+                    robots={NOINDEX_ROBOTS}
+                />
+                <main className="place-page place-page--not-found">
+                    <section className="place-page__not-found">
+                        <p className="place-page__eyebrow">Место не найдено</p>
+                        <h1>Такого объекта пока нет</h1>
+                        <p>
+                            {placeError ||
+                                "Возможно, ссылка устарела или объект еще не добавлен в базу."}
+                        </p>
 
-                    <Link className="place-page__button" to="/map">
-                        Вернуться к карте
-                    </Link>
-                </section>
-            </main>
+                        <Link className="place-page__button" to="/map">
+                            Вернуться к карте
+                        </Link>
+                    </section>
+                </main>
+            </>
         );
     }
 
@@ -466,6 +494,18 @@ export function PlacePage() {
     );
 
     const routeUrl = createPlaceRouteUrl(place);
+    const publicContact = place.contact ?? {};
+    const phoneHref = createPhoneHref(publicContact.phone);
+    const emailHref = createEmailHref(publicContact.email);
+    const telegramHref = createTelegramHref(publicContact.telegram);
+    const websiteHref = createWebsiteHref(publicContact.website);
+    const hasPublicContacts = [
+        publicContact.name,
+        publicContact.phone,
+        publicContact.email,
+        publicContact.telegram,
+        publicContact.website,
+    ].some(Boolean);
     const pageTitle = `${place.title} | Native Places`;
 
     const pageDescription =
@@ -479,29 +519,43 @@ export function PlacePage() {
             ? images[0]
             : "https://native-places.ru/images/logo/logo.png";
 
-    const placeStructuredData = {
-        "@context": "https://schema.org",
-        "@type": "Place",
-        name: place.title,
-        description: pageDescription,
-        url: `https://native-places.ru/place/${place.slug}`,
-        image: pageImage,
-        address: place.address || place.locality || undefined,
-        category: place.categoryTitle || undefined,
-        additionalType: place.typeTitle || undefined,
-        geo: place.position
-            ? {
-                "@type": "GeoCoordinates",
-                latitude: place.position[0],
-                longitude: place.position[1],
-            }
-            : undefined,
-        additionalProperty: (place.attributes ?? []).map((attribute) => ({
-            "@type": "PropertyValue",
-            name: attribute.title,
-            value: formatAttributeValue(attribute),
-        })),
-    };
+    const placeStructuredData = [
+        createBreadcrumbStructuredData([
+            { name: "Главная", path: "/" },
+            { name: "Категории", path: "/categories" },
+            ...(place.categorySlug
+                ? [{
+                    name: place.categoryTitle || "Категория",
+                    path: `/category/${place.categorySlug}`,
+                }]
+                : []),
+            { name: place.title, path: `/place/${place.slug}` },
+        ]),
+        {
+            "@context": "https://schema.org",
+            "@type": "Place",
+            "@id": `${SITE_URL}/place/${place.slug}#place`,
+            name: place.title,
+            description: pageDescription,
+            url: `${SITE_URL}/place/${place.slug}`,
+            image: toAbsoluteSiteUrl(pageImage),
+            address: place.address || place.locality || undefined,
+            category: place.categoryTitle || undefined,
+            additionalType: place.typeTitle || undefined,
+            geo: place.position
+                ? {
+                    "@type": "GeoCoordinates",
+                    latitude: place.position[0],
+                    longitude: place.position[1],
+                }
+                : undefined,
+            additionalProperty: (place.attributes ?? []).map((attribute) => ({
+                "@type": "PropertyValue",
+                name: attribute.title,
+                value: formatAttributeValue(attribute),
+            })),
+        },
+    ];
 
     return (
         <>
@@ -510,7 +564,9 @@ export function PlacePage() {
                 description={pageDescription}
                 canonical={`https://native-places.ru/place/${place.slug}`}
                 image={pageImage}
+                imageAlt={`${place.title} — фото места`}
                 structuredData={placeStructuredData}
+                type="article"
             />
             <main className="place-page">
                 <section className="place-hero">
@@ -654,6 +710,87 @@ export function PlacePage() {
                             <p className="place-hero__lead">
                                 {place.fullDescription || place.description}
                             </p>
+                        )}
+
+                        {hasPublicContacts && (
+                            <section className="place-page__contacts">
+                                <div className="place-page__contacts-header">
+                                    <div>
+                                        <p className="place-page__eyebrow">Контакты</p>
+                                        <h2>Связаться с автором</h2>
+                                    </div>
+                                    <span>Публичные данные</span>
+                                </div>
+
+                                <dl className="place-page__contacts-list">
+                                    {publicContact.name && (
+                                        <div className="place-page__contact-row">
+                                            <dt>Контактное лицо</dt>
+                                            <dd>{publicContact.name}</dd>
+                                        </div>
+                                    )}
+
+                                    {publicContact.phone && (
+                                        <div className="place-page__contact-row">
+                                            <dt>Телефон</dt>
+                                            <dd>
+                                                {phoneHref ? (
+                                                    <a href={phoneHref}>{publicContact.phone}</a>
+                                                ) : publicContact.phone}
+                                            </dd>
+                                        </div>
+                                    )}
+
+                                    {publicContact.email && (
+                                        <div className="place-page__contact-row">
+                                            <dt>Email</dt>
+                                            <dd>
+                                                {emailHref ? (
+                                                    <a href={emailHref}>{publicContact.email}</a>
+                                                ) : publicContact.email}
+                                            </dd>
+                                        </div>
+                                    )}
+
+                                    {publicContact.telegram && (
+                                        <div className="place-page__contact-row">
+                                            <dt>Telegram</dt>
+                                            <dd>
+                                                {telegramHref ? (
+                                                    <a
+                                                        href={telegramHref}
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                    >
+                                                        {publicContact.telegram}
+                                                    </a>
+                                                ) : publicContact.telegram}
+                                            </dd>
+                                        </div>
+                                    )}
+
+                                    {publicContact.website && (
+                                        <div className="place-page__contact-row">
+                                            <dt>Сайт</dt>
+                                            <dd>
+                                                {websiteHref ? (
+                                                    <a
+                                                        href={websiteHref}
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                    >
+                                                        {publicContact.website}
+                                                    </a>
+                                                ) : publicContact.website}
+                                            </dd>
+                                        </div>
+                                    )}
+                                </dl>
+
+                                <p className="place-page__contacts-note">
+                                    Автор сам выбрал данные, доступные на публичной странице.
+                                </p>
+                            </section>
                         )}
 
                         {secondaryAttributes.length > 0 && (

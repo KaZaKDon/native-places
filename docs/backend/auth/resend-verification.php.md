@@ -108,6 +108,7 @@ try {
         'resent' => true,
         'email' => $user['email'],
         'verification_expires_at' => $verificationToken['expires_at'],
+        'resend_available_in_seconds' => getEmailVerificationResendCooldownSeconds(),
     ]);
 } catch (EmailVerificationRateLimitException $e) {
     $retryAfterSeconds = $e->getRetryAfterSeconds();
@@ -129,4 +130,5 @@ try {
 
 | Дата | Изменение |
 |---|---|
+| 2026-08-10 | Успешный ответ теперь сообщает frontend точное время cooldown. |
 | 2026-08-09 | Подготовлена исправленная полная версия по результатам сверки frontend, backend и структуры БД. |

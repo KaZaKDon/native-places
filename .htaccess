@@ -1,0 +1,25 @@
+RewriteEngine On
+
+# Внутренние PHP-модули SEO нельзя открывать по HTTP.
+RewriteRule ^seo(?:/|$) - [F,L]
+
+# Один публичный адрес карты сайта, даже если старый sitemap.xml ещё лежит на сервере.
+RewriteCond %{THE_REQUEST} \s/+sitemap\.php(?:[?\s]) [NC]
+RewriteRule ^sitemap\.php$ /sitemap.xml [R=301,L,NE]
+RewriteRule ^sitemap\.xml$ sitemap.php [L,QSA]
+
+# Старые адреса документов сохраняют накопленный поисковый вес.
+RewriteRule ^rules/?$ /legal/content-rules [R=301,L,NE]
+RewriteRule ^privacy-policy/?$ /legal/privacy [R=301,L,NE]
+RewriteRule ^user-agreement/?$ /legal/user-agreement [R=301,L,NE]
+
+# Корень тоже должен пройти через SEO-оболочку, а не напрямую через index.html.
+RewriteRule ^$ seo-router.php [L,QSA]
+
+# Реальные файлы и каталоги (assets, images, uploads, api) обслуживаются как раньше.
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Все маршруты React получают серверные meta/HTML и настоящий HTTP-статус.
+RewriteRule ^ seo-router.php [L,QSA]

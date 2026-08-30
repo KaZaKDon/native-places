@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
+import { getLegalAcceptancePayload } from "../../../content/legal/legalDocuments";
 import { useAuth } from "../../../shared/auth/useAuth";
 import { favoritesApi } from "../../../shared/api/favoritesApi";
 import { myPlacesApi } from "../../../shared/api/myPlacesApi";
@@ -26,6 +27,8 @@ const sectionComponents = {
     archive: AccountArchiveSection,
     settings: AccountSettingsSection,
 };
+
+const PAID_SERVICES_ENABLED = import.meta.env.VITE_PAID_SERVICES_ENABLED === "true";
 
 
 function formatPlanDuration(days) {
@@ -73,6 +76,30 @@ function SubscriptionModal({
     onClose,
     plans = [],
 }) {
+    const [selectedPlanId, setSelectedPlanId] = useState("");
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
+    const selectedPlan = plans.find((plan) => String(plan.id) === selectedPlanId) || null;
+    const isPaidPlan = Number(selectedPlan?.price || 0) > 0;
+    const termsDocumentCode = isPaidPlan ? "paid_services_offer" : "free_tariff_rules";
+    const termsPath = isPaidPlan ? "/legal/paid-offer" : "/legal/free-tariffs";
+
+    function handleSelectPlan(planId) {
+        setSelectedPlanId(String(planId));
+        setAcceptedTerms(false);
+    }
+
+    function handleConfirmPlan() {
+        if (!selectedPlan || !acceptedTerms || isChanging) {
+            return;
+        }
+
+        onChangePlan(selectedPlan.id, {
+            source: "tariff_change",
+            action: "accepted",
+            documents: getLegalAcceptancePayload([termsDocumentCode]),
+        });
+    }
+
     return (
         <div className="account-tariff-modal" role="dialog" aria-modal="true">
             <div className="account-tariff-modal__panel">
@@ -95,16 +122,21 @@ function SubscriptionModal({
                 <div className="account-tariff-modal__plans">
                     {plans.map((plan) => {
                         const isCurrent = String(currentPlan?.id || "") === String(plan.id);
+                        const isSelected = selectedPlanId === String(plan.id);
+                        const isUnavailablePaidPlan =
+                            Number(plan.price || 0) > 0 && !PAID_SERVICES_ENABLED;
 
                         return (
                             <button
-                                className={isCurrent
-                                    ? "account-tariff-option is-current"
-                                    : "account-tariff-option"}
-                                disabled={isChanging || isCurrent}
+                                className={[
+                                    "account-tariff-option",
+                                    isCurrent ? "is-current" : "",
+                                    isSelected ? "is-selected" : "",
+                                ].filter(Boolean).join(" ")}
+                                disabled={isChanging || isCurrent || isUnavailablePaidPlan}
                                 key={plan.id}
                                 type="button"
-                                onClick={() => onChangePlan(plan.id)}
+                                onClick={() => handleSelectPlan(plan.id)}
                             >
                                 <strong>{plan.title}</strong>
                                 <span>{plan.description}</span>
@@ -113,10 +145,44 @@ function SubscriptionModal({
                                 </small>
                                 <b>{formatPlanPrice(plan.price)}</b>
                                 {isCurrent && <em>Текущий тариф</em>}
+                                {isUnavailablePaidPlan && <em>Будет доступен после запуска оплаты</em>}
                             </button>
                         );
                     })}
                 </div>
+
+                {selectedPlan && (
+                    <div className="account-tariff-modal__confirmation">
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={acceptedTerms}
+                                onChange={(event) => setAcceptedTerms(event.target.checked)}
+                            />
+                            <span>
+                                Я выбрал тариф «{selectedPlan.title}» и ознакомился с{" "}
+                                <Link to={termsPath} target="_blank" rel="noreferrer">
+                                    {isPaidPlan
+                                        ? "публичной офертой и условиями платной услуги"
+                                        : "правилами бесплатных тарифов"}
+                                </Link>
+                                . Автоматического продления и задолженности не возникает.
+                            </span>
+                        </label>
+
+                        <button
+                            type="button"
+                            disabled={!acceptedTerms || isChanging}
+                            onClick={handleConfirmPlan}
+                        >
+                            {isChanging
+                                ? "Применяем тариф..."
+                                : isPaidPlan
+                                    ? `Перейти к оплате ${formatPlanPrice(selectedPlan.price)}`
+                                    : "Подтвердить выбор тарифа"}
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -293,10 +359,13 @@ export function AccountBook() {
     }, []);
 
 
-    async function handleChangePlan(planId) {
+    async function handleChangePlan(planId, legalAcceptance) {
         try {
             setIsChangingTariff(true);
-            const data = await subscriptionsApi.changeSubscription(planId);
+            const data = await subscriptionsApi.changeSubscription(
+                planId,
+                legalAcceptance
+            );
 
             if (data.confirmationUrl) {
                 window.location.href = data.confirmationUrl;

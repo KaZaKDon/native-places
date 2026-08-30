@@ -20,6 +20,7 @@ export function LoginPage() {
         email: "",
         password: "",
     });
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
     const [accessCode, setAccessCode] = useState("");
 
@@ -115,21 +116,40 @@ export function LoginPage() {
                             />
                         </label>
 
-                        <label className="login-field">
-                            <span>Пароль</span>
+                        <div className="login-field">
+                            <label htmlFor="admin-password">Пароль</label>
 
-                            <input
-                                type="password"
-                                value={adminForm.password}
-                                onChange={(event) =>
-                                    setAdminForm((current) => ({
-                                        ...current,
-                                        password: event.target.value,
-                                    }))
-                                }
-                                required
-                            />
-                        </label>
+                            <div className="login-password-field">
+                                <input
+                                    id="admin-password"
+                                    type={isPasswordVisible ? "text" : "password"}
+                                    value={adminForm.password}
+                                    autoComplete="current-password"
+                                    onChange={(event) =>
+                                        setAdminForm((current) => ({
+                                            ...current,
+                                            password: event.target.value,
+                                        }))
+                                    }
+                                    required
+                                />
+
+                                <button
+                                    className="login-password-toggle"
+                                    type="button"
+                                    aria-pressed={isPasswordVisible}
+                                    onClick={() =>
+                                        setIsPasswordVisible((current) => !current)
+                                    }
+                                >
+                                    {isPasswordVisible ? "Скрыть" : "Показать"}
+                                </button>
+                            </div>
+                        </div>
+
+                        <a className="login-forgot-link" href="/auth?mode=forgot">
+                            Забыли пароль?
+                        </a>
 
                         <button
                             className="login-submit"

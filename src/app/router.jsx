@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import { AppLayout } from "../layouts/AppLayout";
 import { RequireAuth } from "../shared/auth/RequireAuth";
@@ -53,16 +53,20 @@ export const router = createBrowserRouter([
                 element: withPageLoader(<VerifyEmailPage />),
             },
             {
+                path: "legal/:documentSlug",
+                element: withPageLoader(<LegalPage />),
+            },
+            {
                 path: "rules",
-                element: withPageLoader(<LegalPage type="rules" />),
+                element: <Navigate to="/legal/content-rules" replace />,
             },
             {
                 path: "privacy-policy",
-                element: withPageLoader(<LegalPage type="privacy" />),
+                element: <Navigate to="/legal/privacy" replace />,
             },
             {
                 path: "user-agreement",
-                element: withPageLoader(<LegalPage type="agreement" />),
+                element: <Navigate to="/legal/user-agreement" replace />,
             },
             {
                 path: "categories",

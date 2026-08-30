@@ -8,6 +8,10 @@ import { MapBottomSheet } from "../features/map-bottom-sheet/MapBottomSheet";
 import { filterPlaces } from "../shared/map/filterPlaces";
 import { useDebouncedValue } from "../shared/search/useDebouncedValue";
 import { Seo } from "../shared/seo/Seo";
+import {
+    SITE_URL,
+    createBreadcrumbStructuredData,
+} from "../shared/seo/seoConfig";
 import { MapView } from "../widgets/MapView/MapView";
 import { MapSidebar } from "../widgets/MapSidebar/MapSidebar";
 
@@ -244,13 +248,32 @@ export function MapPage() {
         );
     }
 
+    const mapStructuredData = [
+        createBreadcrumbStructuredData([
+            { name: "Главная", path: "/" },
+            { name: "Карта", path: "/map" },
+        ]),
+        {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "@id": `${SITE_URL}/map#collection`,
+            name: "Интерактивная карта Native Places",
+            url: `${SITE_URL}/map`,
+            inLanguage: "ru-RU",
+            description:
+                "Карта опубликованных мест и объявлений с фильтрами по категориям, типам и населённым пунктам.",
+        },
+    ];
+
     return (
         <>
             <Seo
-                title="Карта Native Places — недвижимость, аренда, отдых, рыбалка и охота"
+                title="Интерактивная карта мест и объявлений | Native Places"
                 description="Интерактивная карта Native Places с объявлениями о недвижимости, аренде, базах отдыха, рыбалке, охоте и природных местах. Ищите объекты по категориям, типам и населённым пунктам."
-                canonical="https://native-places.ru/map"
-                image="https://native-places.ru/images/logo/logo.png"
+                canonical="/map"
+                image="/images/home/hero-bg.webp"
+                imageAlt="Интерактивная карта Native Places"
+                structuredData={mapStructuredData}
             />
 
             <main className="map-page">

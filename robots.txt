@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /auth
+Disallow: /account
+Disallow: /submit
+Disallow: /verify-email
+Disallow: /routes/
+
+Clean-param: utm_source&utm_medium&utm_campaign&utm_term&utm_content&gclid&yclid&fbclid /
+
+Host: native-places.ru
+Sitemap: https://native-places.ru/sitemap.xml

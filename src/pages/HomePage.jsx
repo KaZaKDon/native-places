@@ -2,6 +2,12 @@ import { Link } from "react-router-dom";
 
 import { Seo } from "../shared/seo/Seo";
 import { useAuth } from "../shared/auth/useAuth";
+import {
+    DEFAULT_SEO_DESCRIPTION,
+    DEFAULT_SEO_IMAGE,
+    SITE_NAME,
+    SITE_URL,
+} from "../shared/seo/seoConfig";
 
 import "./HomePage.css";
 
@@ -15,28 +21,38 @@ export function HomePage() {
             : "Войти / регистрация";
 
     const accountButtonLink = isAuth ? "/account" : "/auth";
-    const structuredData = {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        name: "Native Places",
-        alternateName: "Родные места",
-        url: "https://native-places.ru",
-        description:
-            "Платформа объявлений о недвижимости, аренде, отдыхе, рыбалке, охоте и природном туризме.",
-        publisher: {
+    const structuredData = [
+        {
+            "@context": "https://schema.org",
             "@type": "Organization",
-            name: "VKazakDon Studio",
-            url: "https://vkazakdon.ru",
+            "@id": `${SITE_URL}/#organization`,
+            name: SITE_NAME,
+            url: `${SITE_URL}/`,
+            logo: `${SITE_URL}/images/logo/logo.png`,
         },
-    };
+        {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "@id": `${SITE_URL}/#website`,
+            name: SITE_NAME,
+            alternateName: "Родные места",
+            url: `${SITE_URL}/`,
+            description: DEFAULT_SEO_DESCRIPTION,
+            inLanguage: "ru-RU",
+            publisher: {
+                "@id": `${SITE_URL}/#organization`,
+            },
+        },
+    ];
 
     return (
         <>
             <Seo
                 title="Native Places — недвижимость, аренда, отдых, рыбалка и охота"
                 description="Native Places объединяет недвижимость, аренду, базы отдыха, рыбалку, охоту и природный туризм. Найдите дом, участок, место для отдыха или путешествия, изучите карту, маршруты, природные парки и интересные локации рядом."
-                canonical="https://native-places.ru/"
-                image="https://native-places.ru/images/logo/logo.png"
+                canonical="/"
+                image={DEFAULT_SEO_IMAGE}
+                imageAlt="Native Places — недвижимость, отдых и родные места на карте"
                 structuredData={structuredData}
             />
 

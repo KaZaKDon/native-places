@@ -659,6 +659,12 @@
     background: linear-gradient(180deg, var(--color-paper), var(--color-paper-deep));
 }
 
+.account-tariff-option.is-selected {
+    border-color: var(--color-gold);
+    outline: 2px solid rgba(var(--color-gold-rgb), 0.2);
+    background: linear-gradient(180deg, var(--color-paper), var(--color-paper-deep));
+}
+
 .account-tariff-option:disabled {
     cursor: default;
     opacity: 0.72;
@@ -688,6 +694,57 @@
     font-size: 12px;
     font-style: normal;
     font-weight: 900;
+}
+
+.account-tariff-modal__confirmation {
+    margin-top: 20px;
+    padding: 18px;
+    border: 1px solid rgba(var(--color-gold-rgb), 0.32);
+    border-radius: 20px;
+    background: rgba(var(--color-gold-rgb), 0.08);
+}
+
+.account-tariff-modal__confirmation label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+
+    color: rgba(var(--color-bg-deep-rgb), 0.82);
+    line-height: 1.5;
+}
+
+.account-tariff-modal__confirmation input {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    flex: 0 0 auto;
+    accent-color: var(--color-gold);
+}
+
+.account-tariff-modal__confirmation a {
+    color: var(--color-bg-deep);
+    font-weight: 800;
+    text-underline-offset: 3px;
+}
+
+.account-tariff-modal__confirmation > button {
+    width: 100%;
+    min-height: 46px;
+    margin-top: 16px;
+
+    border: 0;
+    border-radius: 14px;
+    background: var(--color-gold);
+    color: var(--color-bg-deep);
+
+    font: inherit;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.account-tariff-modal__confirmation > button:disabled {
+    cursor: not-allowed;
+    opacity: 0.48;
 }
 
 @media (max-width: 1300px) {

@@ -196,13 +196,13 @@ try {
             p.short_description,
             p.full_description,
             p.cover_image,
-            p.address,
-            p.latitude,
-            p.longitude,
-            p.contact_name,
-            p.phone,
-            p.telegram,
-            p.email,
+            COALESCE(ppd.address, p.address) AS address,
+            COALESCE(ppd.latitude, p.latitude) AS latitude,
+            COALESCE(ppd.longitude, p.longitude) AS longitude,
+            COALESCE(ppd.contact_name, p.contact_name) AS contact_name,
+            COALESCE(ppd.phone, p.phone) AS phone,
+            COALESCE(ppd.telegram, p.telegram) AS telegram,
+            COALESCE(ppd.email, p.email) AS email,
             p.website,
             p.booking_type,
             p.booking_url,
@@ -216,6 +216,13 @@ try {
             p.created_at,
             p.updated_at,
 
+            COALESCE(pps.show_contact_name, 0) AS show_contact_name,
+            COALESCE(pps.show_phone, 0) AS show_phone,
+            COALESCE(pps.show_email, 0) AS show_email,
+            COALESCE(pps.show_telegram, 0) AS show_telegram,
+            COALESCE(pps.show_address, 0) AS show_address,
+            COALESCE(pps.show_coordinates, 1) AS show_coordinates,
+
             l.title AS locality_title,
             l.slug AS locality_slug,
             COALESCE(r.title, l.region) AS locality_region,
@@ -228,6 +235,8 @@ try {
             pt.title AS type_title
 
         FROM places p
+        LEFT JOIN place_private_data ppd ON ppd.place_id = p.id
+        LEFT JOIN place_publication_settings pps ON pps.place_id = p.id
         INNER JOIN categories c ON c.id = p.category_id
         INNER JOIN place_types pt ON pt.id = p.place_type_id
         LEFT JOIN localities l ON l.id = p.locality_id

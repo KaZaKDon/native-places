@@ -8,7 +8,13 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "node --experimental-specifier-resolution=node --test"
+    "test": "node --experimental-specifier-resolution=node --test",
+    "test:e2e": "npm run build && playwright test",
+    "test:e2e:ui": "npm run build && playwright test --ui",
+    "test:admin": "npm --prefix admin run build && playwright test --config=playwright.admin.config.js",
+    "test:production": "playwright test --config=playwright.production.config.js",
+    "test:production:api": "playwright test --config=playwright.production.config.js tests/smoke/production-api.spec.js",
+    "check": "npm test && npm run lint && npm run test:e2e && npm run test:admin"
   },
   "dependencies": {
     "leaflet": "^1.9.4",
@@ -16,10 +22,13 @@
     "react-dom": "^19.2.6",
     "react-helmet-async": "^3.0.0",
     "react-leaflet": "^5.0.0",
-    "react-router-dom": "^7.15.1"
+    "react-markdown": "^10.1.0",
+    "react-router-dom": "^7.15.1",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.62.1",
     "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^10.3.0",
     "eslint-plugin-react-hooks": "^7.1.1",

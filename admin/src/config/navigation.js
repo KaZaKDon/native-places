@@ -120,6 +120,14 @@ export const navigationItems = [{
         roles: ["admin"],
     },
     {
+        id: "internal-documents",
+        label: "Регламенты",
+        path: "/internal-documents",
+        icon: "📑",
+        badge: null,
+        roles: ["admin", "moderator"],
+    },
+    {
         id: "settings",
         label: "Настройки сайта",
         path: "/settings",

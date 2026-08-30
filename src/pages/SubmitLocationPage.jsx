@@ -6,6 +6,8 @@ import {
     getSubmitLocation,
     saveSubmitLocation,
 } from "../shared/storage/submitLocationStorage";
+import { Seo } from "../shared/seo/Seo";
+import { NOINDEX_ROBOTS } from "../shared/seo/seoConfig";
 
 import "./SubmitLocationPage.css";
 
@@ -70,8 +72,15 @@ export function SubmitLocationPage() {
     }
 
     return (
-        <main className="submit-location-page">
-            <section className="submit-location-layout">
+        <>
+            <Seo
+                title="Координаты объявления | Native Places"
+                description="Выбор координат при добавлении или редактировании объявления Native Places."
+                canonical="/submit/location"
+                robots={NOINDEX_ROBOTS}
+            />
+            <main className="submit-location-page">
+                <section className="submit-location-layout">
                 <aside className="submit-location-panel">
                     <Link className="submit-location-panel__back" to="/submit">
                         ← Назад к форме
@@ -128,7 +137,8 @@ export function SubmitLocationPage() {
                         />
                     </MapContainer>
                 </div>
-            </section>
-        </main>
+                </section>
+            </main>
+        </>
     );
 }

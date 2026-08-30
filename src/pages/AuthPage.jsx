@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import { authApi } from "../shared/api/authApi";
@@ -21,9 +21,38 @@ const initialForm = {
 };
 
 function getInitialMode(searchParams) {
-    return searchParams.get("reset_token") || searchParams.get("token")
-        ? "reset"
-        : "login";
+    if (searchParams.get("reset_token") || searchParams.get("token")) {
+        return "reset";
+    }
+
+    return searchParams.get("mode") === "forgot" ? "forgot" : "login";
+}
+
+function normalizeCooldownSeconds(value) {
+    const seconds = Number(value);
+
+    if (!Number.isFinite(seconds) || seconds <= 0) {
+        return 0;
+    }
+
+    return Math.ceil(seconds);
+}
+
+function formatCooldown(seconds) {
+    const safeSeconds = Math.max(0, Math.ceil(seconds));
+    const hours = Math.floor(safeSeconds / 3600);
+    const minutes = Math.floor((safeSeconds % 3600) / 60);
+    const remainingSeconds = safeSeconds % 60;
+
+    if (hours > 0) {
+        return minutes > 0 ? `${hours} ч ${minutes} мин` : `${hours} ч`;
+    }
+
+    if (minutes > 0) {
+        return `${minutes} мин ${remainingSeconds} сек`;
+    }
+
+    return `${remainingSeconds} сек`;
 }
 
 export function AuthPage() {
@@ -45,11 +74,29 @@ export function AuthPage() {
     const [errorMessage, setErrorMessage] = useState("");
     const [statusMessage, setStatusMessage] = useState("");
     const [verificationNotice, setVerificationNotice] = useState(null);
+    const [resendCooldownSeconds, setResendCooldownSeconds] = useState(0);
+    const [isResendRateLimited, setIsResendRateLimited] = useState(false);
 
     const isLoginMode = mode === "login";
     const isRegisterMode = mode === "register";
     const isForgotMode = mode === "forgot";
     const isResetMode = mode === "reset";
+
+    useEffect(() => {
+        if (resendCooldownSeconds <= 0) {
+            return undefined;
+        }
+
+        const timeoutId = window.setTimeout(() => {
+            setResendCooldownSeconds((currentSeconds) =>
+                Math.max(0, currentSeconds - 1)
+            );
+        }, 1000);
+
+        return () => {
+            window.clearTimeout(timeoutId);
+        };
+    }, [resendCooldownSeconds]);
 
     const title = useMemo(() => {
         if (isForgotMode) {
@@ -91,17 +138,20 @@ export function AuthPage() {
         setErrorMessage("");
         setStatusMessage("");
         setVerificationNotice(null);
+        setResendCooldownSeconds(0);
+        setIsResendRateLimited(false);
         setShowPassword(false);
     }
 
     async function handleResendVerification() {
-        if (!verificationNotice?.email) {
+        if (!verificationNotice?.email || resendCooldownSeconds > 0) {
             return;
         }
 
         setIsSubmitting(true);
         setErrorMessage("");
         setStatusMessage("");
+        setIsResendRateLimited(false);
 
         try {
             const data = await authApi.resendVerification(verificationNotice.email);
@@ -110,9 +160,23 @@ export function AuthPage() {
                 ...currentNotice,
                 expiresAt: data.verification_expires_at || currentNotice?.expiresAt || "",
             }));
+            setResendCooldownSeconds(
+                normalizeCooldownSeconds(data.resend_available_in_seconds)
+            );
+            setIsResendRateLimited(false);
             setStatusMessage(data.message || "Письмо подтверждения отправлено повторно.");
         } catch (error) {
-            setErrorMessage(error.message || "Не удалось отправить письмо повторно");
+            const retryAfterSeconds = normalizeCooldownSeconds(
+                error.extra?.retry_after_seconds
+            );
+
+            if (error.status === 429 && retryAfterSeconds > 0) {
+                setResendCooldownSeconds(retryAfterSeconds);
+                setIsResendRateLimited(true);
+            } else {
+                setIsResendRateLimited(false);
+                setErrorMessage(error.message || "Не удалось отправить письмо повторно");
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -195,6 +259,9 @@ export function AuthPage() {
                         email: registerData.email || form.email,
                         expiresAt: registerData.verification_expires_at || "",
                     });
+                    setResendCooldownSeconds(
+                        normalizeCooldownSeconds(registerData.resend_available_in_seconds)
+                    );
                     setForm({
                         ...initialForm,
                         email: registerData.email || form.email,
@@ -214,6 +281,7 @@ export function AuthPage() {
                     email: error.extra.email || form.email,
                     expiresAt: error.extra.verification_expires_at || "",
                 });
+                setResendCooldownSeconds(0);
                 setStatusMessage(
                     error.message ||
                     "Подтвердите email перед входом. Если письма нет, отправьте его повторно."
@@ -301,14 +369,25 @@ export function AuthPage() {
                             </p>
                         )}
 
+                        {isResendRateLimited && resendCooldownSeconds > 0 ? (
+                            <p className="auth-form__error" role="alert">
+                                Письмо уже отправлялось недавно. Повторите через{" "}
+                                {formatCooldown(resendCooldownSeconds)}.
+                            </p>
+                        ) : null}
+
                         <div className="auth-verification-notice__actions">
                             <button
                                 className="auth-form__submit"
                                 type="button"
                                 onClick={handleResendVerification}
-                                disabled={isSubmitting}
+                                disabled={isSubmitting || resendCooldownSeconds > 0}
                             >
-                                {isSubmitting ? "Отправляем..." : "Отправить письмо повторно"}
+                                {isSubmitting
+                                    ? "Отправляем..."
+                                    : resendCooldownSeconds > 0
+                                        ? `Повторить через ${formatCooldown(resendCooldownSeconds)}`
+                                        : "Отправить письмо повторно"}
                             </button>
 
                             <button
@@ -436,13 +515,13 @@ export function AuthPage() {
                                     />
 
                                     <span>
-                                        Я принимаю{" "}
-                                        <Link to="/rules" state={{ from: "/auth" }}>
-                                            правила сайта
+                                        Принимаю{" "}
+                                        <Link to="/legal/user-agreement" target="_blank" rel="noreferrer">
+                                            Пользовательское соглашение
                                         </Link>{" "}
                                         и{" "}
-                                        <Link to="/user-agreement" state={{ from: "/auth" }}>
-                                            пользовательское соглашение
+                                        <Link to="/legal/content-rules" target="_blank" rel="noreferrer">
+                                            Правила размещения материалов
                                         </Link>
                                         .
                                     </span>
@@ -458,9 +537,13 @@ export function AuthPage() {
                                     />
 
                                     <span>
-                                        Я даю согласие на обработку персональных данных и ознакомлен с{" "}
-                                        <Link to="/privacy-policy" state={{ from: "/auth" }}>
-                                            политикой конфиденциальности
+                                        Даю отдельное{" "}
+                                        <Link to="/legal/personal-data-consent" target="_blank" rel="noreferrer">
+                                            согласие на обработку персональных данных
+                                        </Link>{" "}
+                                        и подтверждаю ознакомление с{" "}
+                                        <Link to="/legal/privacy" target="_blank" rel="noreferrer">
+                                            Политикой конфиденциальности
                                         </Link>
                                         .
                                     </span>
@@ -475,7 +558,12 @@ export function AuthPage() {
                                     />
 
                                     <span>
-                                        Я согласен получать новости и информационные письма Native Places.
+                                        Хочу получать новости, подборки и рекламные предложения Native Places по email
+                                        на условиях{" "}
+                                        <Link to="/legal/marketing-consent" target="_blank" rel="noreferrer">
+                                            отдельного согласия
+                                        </Link>
+                                        . Отписаться можно в любой момент.
                                     </span>
                                 </label>
                             </div>
@@ -531,13 +619,13 @@ export function AuthPage() {
                     </form>
                 )}
                 <nav className="auth-card__legal-links" aria-label="Документы сайта">
-                    <Link to="/rules" state={{ from: "/auth" }}>
+                    <Link to="/legal/content-rules" target="_blank" rel="noreferrer">
                         Правила
                     </Link>
-                    <Link to="/user-agreement" state={{ from: "/auth" }}>
+                    <Link to="/legal/user-agreement" target="_blank" rel="noreferrer">
                         Соглашение
                     </Link>
-                    <Link to="/privacy-policy" state={{ from: "/auth" }}>
+                    <Link to="/legal/privacy" target="_blank" rel="noreferrer">
                         Конфиденциальность
                     </Link>
                 </nav>

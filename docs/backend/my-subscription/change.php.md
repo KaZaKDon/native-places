@@ -235,6 +235,7 @@ HTTP `200`
 require_once __DIR__ . '/../shared/cors.php';
 require_once __DIR__ . '/../shared/response.php';
 require_once __DIR__ . '/../shared/auth.php';
+require_once __DIR__ . '/../shared/legal.php';
 require_once __DIR__ . '/../config/database.php';
 
 $userId = requireAuth();
@@ -246,6 +247,7 @@ if (!is_array($input)) {
 }
 
 $planId = (int) ($input['plan_id'] ?? 0);
+$legalAcceptanceInput = $input['legal_acceptance'] ?? null;
 
 if ($planId <= 0) {
     errorResponse('Выберите тариф', 422, [
@@ -291,6 +293,23 @@ try {
     $maxPlaces = (int) ($plan['max_places'] ?? 0);
     $durationDays = (int) ($plan['duration_days'] ?? 0);
     $price = (float) ($plan['price'] ?? 0);
+
+    if ($price > 0 && !NATIVE_PLACES_PAID_SERVICES_ENABLED) {
+        errorResponse('Платные тарифы пока не подключены', 422, [
+            'errors' => [
+                'plan_id' => 'Выберите бесплатный тариф или дождитесь запуска оплаты',
+            ],
+        ]);
+    }
+
+    $requiredDocumentType = $price > 0
+        ? 'paid_services_offer'
+        : 'free_tariff_rules';
+
+    $acceptedDocuments = validateLegalAcceptancePayload(
+        is_array($legalAcceptanceInput) ? $legalAcceptanceInput : [],
+        [$requiredDocumentType]
+    );
 
     $activePlacesStmt = $pdo->prepare("
         SELECT COUNT(*)
@@ -355,6 +374,21 @@ try {
         ]);
 
         $paymentId = (int) $pdo->lastInsertId();
+
+        recordUserLegalAcceptances(
+            $pdo,
+            $userId,
+            $acceptedDocuments,
+            'tariff_change',
+            'accepted',
+            'payment',
+            $paymentId,
+            [
+                'plan_id' => $planId,
+                'price' => $price,
+                'currency' => 'RUB',
+            ]
+        );
 
         $pdo->commit();
 
@@ -427,6 +461,21 @@ try {
 
     $subscriptionId = (int) $pdo->lastInsertId();
 
+    recordUserLegalAcceptances(
+        $pdo,
+        $userId,
+        $acceptedDocuments,
+        'tariff_change',
+        'accepted',
+        'subscription',
+        $subscriptionId,
+        [
+            'plan_id' => $planId,
+            'price' => $price,
+            'duration_days' => $durationDays,
+        ]
+    );
+
     $plansStmt = $pdo->query("
         SELECT
             id,
@@ -475,6 +524,12 @@ try {
         ],
         'available_plans' => $availablePlans,
     ]);
+} catch (InvalidArgumentException $e) {
+    if (isset($pdo) && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+
+    errorResponse($e->getMessage(), 422);
 } catch (Throwable $e) {
     if (isset($pdo) && $pdo->inTransaction()) {
         $pdo->rollBack();
@@ -484,6 +539,7 @@ try {
         'error' => $e->getMessage(),
     ]);
 }
+
 ```
 
 ## История изменений

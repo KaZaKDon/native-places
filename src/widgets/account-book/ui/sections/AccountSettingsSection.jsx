@@ -255,8 +255,7 @@ export function AccountSettingsSection({ onProfileUpdate }) {
             });
 
             onProfileUpdate?.(updatedProfile);
-
-            setProfileStatus("Профиль сохранён.");
+            closeProfileModal();
         } catch (error) {
             setProfileStatus(error.message || "Не удалось сохранить профиль.");
         }
@@ -521,6 +520,32 @@ export function AccountSettingsSection({ onProfileUpdate }) {
                 </button>
 
             </div>
+
+            <section className="account-settings-legal">
+                <div>
+                    <span>Данные и документы</span>
+                    <h2>Управление персональными данными</h2>
+                    <p>
+                        Здесь можно ознакомиться с правилами обработки данных и порядком
+                        направления запроса администрации.
+                    </p>
+                </div>
+
+                <nav aria-label="Документы о персональных данных">
+                    <Link to="/legal/privacy" target="_blank" rel="noreferrer">
+                        Политика конфиденциальности
+                    </Link>
+                    <Link to="/legal/data-requests" target="_blank" rel="noreferrer">
+                        Обращения по персональным данным
+                    </Link>
+                    <Link to="/legal/marketing-consent" target="_blank" rel="noreferrer">
+                        Условия информационных рассылок
+                    </Link>
+                    <Link to="/legal/cookies" target="_blank" rel="noreferrer">
+                        Политика cookie
+                    </Link>
+                </nav>
+            </section>
 
             <section className="account-settings-notifications">
                 <div>
