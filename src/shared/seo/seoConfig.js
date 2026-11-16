@@ -3,10 +3,10 @@ export const SITE_URL = "https://native-places.ru";
 export const SITE_LOCALE = "ru_RU";
 
 export const DEFAULT_SEO_TITLE =
-    "Native Places — места, отдых и объявления на карте";
+    "Native Places — объявления и справочник природных мест";
 
 export const DEFAULT_SEO_DESCRIPTION =
-    "Native Places — информационная площадка и карта мест, недвижимости, аренды, отдыха, рыбалки, охоты и природных маршрутов.";
+    "Native Places: бесплатный справочник рек и природных мест, карта, объявления о недвижимости, аренде и отдыхе. Начните с Ростовской области.";
 
 export const DEFAULT_SEO_IMAGE = `${SITE_URL}/images/home/hero-bg.webp`;
 export const DEFAULT_ROBOTS = "index, follow, max-image-preview:large";

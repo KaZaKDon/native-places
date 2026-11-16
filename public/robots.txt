@@ -1,11 +1,12 @@
 User-agent: *
-
 Allow: /
-
 Disallow: /api/
-Disallow: /admin
+Disallow: /admin/
 
+# Не запрещать /auth, /account и другие noindex-страницы:
+# роботу необходимо увидеть их meta robots / X-Robots-Tag.
+Clean-param: utm_source&utm_medium&utm_campaign&utm_term&utm_content&gclid&yclid&fbclid /
 Clean-param: category&place /map
 
-Sitemap: https://native-places.ru/sitemap.xml
 Host: native-places.ru
+Sitemap: https://native-places.ru/sitemap.xml

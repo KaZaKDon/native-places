@@ -15,6 +15,7 @@ function seoSnapshotNavigation(): string
         . '<a href="/">Главная</a>'
         . '<a href="/categories">Категории</a>'
         . '<a href="/map">Карта</a>'
+        . '<a href="/directory">Справочник</a>'
         . '</nav>';
 }
 
@@ -23,31 +24,46 @@ function seoHomeSnapshot(): string
     return seoSnapshotLayout(
         '<p>Native Places</p>'
         . '<h1>Родные места</h1>'
-        . '<p>Недвижимость, аренда, отдых, рыбалка и природа на одной карте.</p>'
+        . '<p>Недвижимость, аренда, отдых, рыбалка и природа на одной карте. '
+        . 'Сейчас проект развивается преимущественно в Ростовской области, '
+        . 'постепенно расширяя географию на другие регионы России.</p>'
+        . '<h2>Что можно найти на Native Places</h2>'
+        . seoCategoriesSnapshotCards('h3')
+        . '<p>Выберите категорию или откройте карту и используйте фильтры '
+        . 'по категориям и населённым пунктам.</p>'
+        . '<p>В отдельном <a href="/directory">бесплатном справочнике</a> собраны реки, водоёмы и интересные природные места.</p>'
         . seoSnapshotNavigation()
     );
 }
 
-function seoCategoriesSnapshot(): string
+function seoCategoriesSnapshotCards(string $heading = 'h2'): string
 {
+    if (!in_array($heading, ['h2', 'h3'], true)) {
+        $heading = 'h2';
+    }
     $cards = '';
 
     foreach (SEO_CATEGORY_PAGES as $slug => $category) {
         $cards .= '<article class="server-seo-snapshot__card">'
-            . '<h2><a href="/category/' . seoHtmlEscape($slug) . '">'
+            . '<' . $heading . '><a href="/category/' . seoHtmlEscape($slug) . '">'
             . seoHtmlEscape($category['name'])
-            . '</a></h2>'
+            . '</a></' . $heading . '>'
             . '<p>' . seoHtmlEscape($category['description']) . '</p>'
             . '</article>';
     }
 
+    return '<section class="server-seo-snapshot__cards" aria-label="Категории">'
+        . $cards
+        . '</section>';
+}
+
+function seoCategoriesSnapshot(): string
+{
     return seoSnapshotLayout(
         '<p><a href="/">Native Places</a></p>'
         . '<h1>Категории мест и объявлений</h1>'
         . '<p>Выберите направление и откройте опубликованные места списком или на карте.</p>'
-        . '<section class="server-seo-snapshot__cards" aria-label="Категории">'
-        . $cards
-        . '</section>'
+        . seoCategoriesSnapshotCards()
         . seoSnapshotNavigation()
     );
 }
@@ -76,8 +92,11 @@ function seoCategorySnapshot(array $category, array $places): string
 
     return seoSnapshotLayout(
         '<p><a href="/categories">Все категории</a></p>'
-        . '<h1>' . seoHtmlEscape($category['name']) . '</h1>'
-        . '<p>' . seoHtmlEscape($category['description']) . '</p>'
+        . '<h1>' . seoHtmlEscape($category['heading'] ?? $category['name']) . '</h1>'
+        . '<p>' . seoHtmlEscape($category['lead'] ?? $category['description']) . '</p>'
+        . '<h2>О разделе</h2>'
+        . '<p>' . seoHtmlEscape($category['text'] ?? $category['description']) . '</p>'
+        . '<h2>Объявления категории</h2>'
         . '<section class="server-seo-snapshot__cards" aria-label="Опубликованные места">'
         . $cards
         . '</section>'
@@ -107,7 +126,12 @@ function seoPlaceSnapshot(array $place): string
         $place['region_title'] ?? null,
     ])));
     $location = implode(', ', $locationParts);
-    $image = seoNormalizeMediaUrl($place['seo_image'] ?? null);
+    $imageMarkup = !empty($place['seo_image'])
+        ? '<img class="server-seo-snapshot__image" src="'
+            . seoHtmlEscape(seoNormalizeMediaUrl($place['seo_image'])) . '" alt="'
+            . seoHtmlEscape(($place['title'] ?? '') . ' — фотография места')
+            . '">'
+        : '';
     $contacts = '';
 
     foreach ([
@@ -133,9 +157,7 @@ function seoPlaceSnapshot(array $place): string
         . (!empty($place['address'])
             ? '<p><strong>Адрес или ориентир:</strong> ' . seoHtmlEscape($place['address']) . '</p>'
             : '')
-        . '<img class="server-seo-snapshot__image" src="' . seoHtmlEscape($image) . '" alt="'
-        . seoHtmlEscape(($place['title'] ?? '') . ' — фотография места')
-        . '">'
+        . $imageMarkup
         . '<h2>Описание</h2><p>' . seoHtmlEscape($description) . '</p>'
         . ($contacts !== '' ? '<h2>Публичные контакты</h2>' . $contacts : '')
         . seoSnapshotNavigation()

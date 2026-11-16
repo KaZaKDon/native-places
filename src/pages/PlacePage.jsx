@@ -19,6 +19,7 @@ import { useAuth } from "../shared/auth/useAuth";
 import { AddToRouteModal } from "../features/routes/AddToRouteModal";
 
 import { Seo } from "../shared/seo/Seo";
+import { createPlaceSeo } from "../shared/seo/placeSeo";
 import {
     NOINDEX_ROBOTS,
     SITE_URL,
@@ -506,13 +507,7 @@ export function PlacePage() {
         publicContact.telegram,
         publicContact.website,
     ].some(Boolean);
-    const pageTitle = `${place.title} | Native Places`;
-
-    const pageDescription =
-        place.shortDescription ||
-        place.fullDescription ||
-        place.description ||
-        `${place.categoryTitle}. ${place.address || ""}`;
+    const { title: pageTitle, description: pageDescription } = createPlaceSeo(place);
 
     const pageImage =
         images.length > 0
@@ -538,7 +533,7 @@ export function PlacePage() {
             name: place.title,
             description: pageDescription,
             url: `${SITE_URL}/place/${place.slug}`,
-            image: toAbsoluteSiteUrl(pageImage),
+            image: images.length > 0 ? toAbsoluteSiteUrl(pageImage) : undefined,
             address: place.address || place.locality || undefined,
             category: place.categoryTitle || undefined,
             additionalType: place.typeTitle || undefined,
@@ -564,9 +559,8 @@ export function PlacePage() {
                 description={pageDescription}
                 canonical={`https://native-places.ru/place/${place.slug}`}
                 image={pageImage}
-                imageAlt={`${place.title} — фото места`}
+                imageAlt={images.length > 0 ? `${place.title} — фото места` : "Логотип Native Places"}
                 structuredData={placeStructuredData}
-                type="article"
             />
             <main className="place-page">
                 <section className="place-hero">

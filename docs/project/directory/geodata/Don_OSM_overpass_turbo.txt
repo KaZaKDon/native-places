@@ -1,0 +1,11 @@
+/* Native Places / river Don / source search, NOT verified export.
+   Run in https://overpass-turbo.eu/ after positioning the map over
+   the desired SMALL section of the river in Rostov oblast.
+   {{bbox}} is taken from the current Overpass Turbo map view.
+   Verify every returned way belongs to the target river and segment.
+   Export > download as GeoJSON. Do not import large/full river geometry.
+   Source: © OpenStreetMap contributors (ODbL), https://www.openstreetmap.org/copyright
+*/
+[out:json][timeout:90];
+way["waterway"="river"]["name"="Дон"]({{bbox}});
+out geom;

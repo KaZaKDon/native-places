@@ -53,6 +53,43 @@ function seoNormalizeMediaUrl(?string $value): string
     return $path !== '' ? seoAbsoluteUrl($path) : seoAbsoluteUrl(SEO_DEFAULT_IMAGE);
 }
 
+
+function seoPlaceMetaTitle(array $place): string
+{
+    $title = seoNormalizeText($place['title'] ?? '', SEO_SITE_NAME);
+    $location = seoNormalizeText(
+        $place['locality_title'] ?? '',
+        seoNormalizeText($place['region_title'] ?? '')
+    );
+
+    if ($location !== '' && stripos($title, $location) === false) {
+        return $title . ' — ' . $location . ' | ' . SEO_SITE_NAME;
+    }
+
+    return $title . ' | ' . SEO_SITE_NAME;
+}
+
+function seoPlaceMetaDescription(array $place): string
+{
+    $summary = seoNormalizeText(
+        $place['short_description'] ?? '',
+        seoNormalizeText(
+            $place['full_description'] ?? '',
+            seoNormalizeText($place['category_title'] ?? '', 'Объявление')
+        )
+    );
+    $location = seoNormalizeText(
+        $place['locality_title'] ?? '',
+        seoNormalizeText($place['region_title'] ?? '')
+    );
+
+    return $summary
+        . ($location !== '' && stripos($summary, $location) === false
+            ? ' Населённый пункт: ' . $location . '.'
+            : '')
+        . ' Сведения об объекте и расположение на карте.';
+}
+
 function seoJsonEncode(array $value): string
 {
     $json = json_encode(

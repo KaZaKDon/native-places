@@ -1,5 +1,12 @@
 RewriteEngine On
 
+# HTTPS and one canonical hostname; preserve request URI and query string.
+RewriteCond %{HTTP_HOST} ^www\.native-places\.ru$ [NC]
+RewriteRule ^ https://native-places.ru%{REQUEST_URI} [R=301,L,NE]
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !^https$ [NC]
+RewriteRule ^ https://native-places.ru%{REQUEST_URI} [R=301,L,NE]
+
 # Внутренние PHP-модули SEO нельзя открывать по HTTP.
 RewriteRule ^seo(?:/|$) - [F,L]
 

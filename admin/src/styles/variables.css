@@ -32,3 +32,10 @@
     --transition-fast: 0.18s ease;
     --transition-normal: 0.3s ease;
 }
+/* Geographic preview tokens, kept separate from component CSS. */
+:root {
+    --directory-map-water: #1674ca;
+    --directory-map-polygon: rgba(22, 116, 202, 0.24);
+    --directory-map-bg: #e7edf2;
+    --directory-map-attribution-bg: rgba(255, 255, 255, 0.9);
+}

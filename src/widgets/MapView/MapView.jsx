@@ -1,11 +1,13 @@
 import { MapContainer, Marker, TileLayer, Tooltip } from "react-leaflet";
 
 import { createMarkerIcon } from "../../shared/map/createMarkerIcon";
+import { DirectoryMapShapes } from "../../features/directory/DirectoryMapGeometry";
 
 import { MapAutoFocus } from "./MapAutoFocus";
 
 export function MapView({
     places = [],
+    directoryEntries = [],
     selectedPlace,
     hoveredPlace,
     onSelectPlace,
@@ -21,11 +23,12 @@ export function MapView({
             className="native-map"
         >
             <TileLayer
-                attribution="&copy; OpenStreetMap"
+                attribution="&copy; OpenStreetMap contributors"
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
 
             <MapAutoFocus places={places} selectedPlace={selectedPlace} />
+            <DirectoryMapShapes entries={directoryEntries} />
 
             {places.map((place) => {
                 const isActive = selectedPlace?.id === place.id;

@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 
+import { categoryCards } from "../shared/config/categoryConfig";
+
 import { Seo } from "../shared/seo/Seo";
 import { useAuth } from "../shared/auth/useAuth";
 import {
@@ -48,8 +50,8 @@ export function HomePage() {
     return (
         <>
             <Seo
-                title="Native Places — недвижимость, аренда, отдых, рыбалка и охота"
-                description="Native Places объединяет недвижимость, аренду, базы отдыха, рыбалку, охоту и природный туризм. Найдите дом, участок, место для отдыха или путешествия, изучите карту, маршруты, природные парки и интересные локации рядом."
+                title="Native Places — объявления и справочник природных мест"
+                description={DEFAULT_SEO_DESCRIPTION}
                 canonical="/"
                 image={DEFAULT_SEO_IMAGE}
                 imageAlt="Native Places — недвижимость, отдых и родные места на карте"
@@ -116,7 +118,44 @@ export function HomePage() {
                             >
                                 Категории
                             </Link>
+                            <Link
+                                className="hero__button hero__button--primary"
+                                to="/directory"
+                            >
+                                Справочник
+                            </Link>
                         </div>
+                    </div>
+                </section>
+
+                <section className="home-discovery" aria-labelledby="home-discovery-title">
+                    <div className="home-discovery__inner">
+                        <p className="home-discovery__eyebrow">Откройте родные места</p>
+                        <h2 id="home-discovery-title">Что можно найти на Native Places</h2>
+                        <p className="home-discovery__lead">
+                            Выбирайте объявления о недвижимости и аренде, базы отдыха,
+                            места для рыбалки, охоты и природные локации.
+                            Сейчас проект развивается преимущественно в Ростовской области;
+                            другие регионы добавляются постепенно.
+                        </p>
+                        <div className="home-discovery__grid">
+                            {categoryCards.map((category) => (
+                                <Link
+                                    key={category.id}
+                                    className="home-discovery__card"
+                                    to={`/category/${category.id}`}
+                                >
+                                    <h3>{category.title}</h3>
+                                    <p>{category.description}</p>
+                                    <span aria-hidden="true">Посмотреть →</span>
+                                </Link>
+                            ))}
+                        </div>
+                        <p className="home-discovery__footer">
+                            Предпочитаете искать по расположению? <Link to="/map">Откройте карту мест</Link>
+                            и используйте фильтры по категориям и населённым пунктам.
+                            А <Link to="/directory">в справочнике</Link> доступны бесплатные описания рек и природных мест.
+                        </p>
                     </div>
                 </section>
             </main>

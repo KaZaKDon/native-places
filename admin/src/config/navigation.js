@@ -72,6 +72,14 @@ export const navigationItems = [{
         roles: ["admin", "moderator"],
     },
     {
+        id: "directory",
+        label: "Справочник мест",
+        path: "/directory",
+        icon: "🗺️",
+        badge: null,
+        roles: ["admin"],
+    },
+    {
         id: "dictionaries",
         label: "Справочники",
         path: "/dictionaries",

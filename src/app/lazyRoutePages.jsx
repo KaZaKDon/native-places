@@ -67,3 +67,6 @@ export const NotFoundPage = lazyNamedPage(
     () => import("../pages/NotFound/NotFoundPage"),
     "NotFoundPage"
 );
+
+export const DirectoryPage = lazyNamedPage(() => import("../pages/DirectoryPage"), "DirectoryPage");
+export const DirectoryEntryPage = lazyNamedPage(() => import("../pages/DirectoryEntryPage"), "DirectoryEntryPage");

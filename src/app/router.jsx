@@ -7,6 +7,8 @@ import {
     AccountPage,
     AuthPage,
     CategoriesPage,
+    DirectoryPage,
+    DirectoryEntryPage,
     CategoryPage,
     HomePage,
     LegalPage,
@@ -75,6 +77,14 @@ export const router = createBrowserRouter([
             {
                 path: "category/:slug",
                 element: withPageLoader(<CategoryPage />),
+            },
+            {
+                path: "directory",
+                element: withPageLoader(<DirectoryPage />),
+            },
+            {
+                path: "directory/:type/:slug",
+                element: withPageLoader(<DirectoryEntryPage />),
             },
             {
                 path: "map",

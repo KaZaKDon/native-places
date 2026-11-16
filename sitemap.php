@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/seo/config.php';
 require_once __DIR__ . '/seo/helpers.php';
 require_once __DIR__ . '/seo/data.php';
+require_once __DIR__ . '/seo/directory.php';
 require_once __DIR__ . '/api/config/database.php';
 
 function sitemapDate(?string $value): string
@@ -88,6 +89,33 @@ foreach ($places as $place) {
             ? seoNormalizeMediaUrl($place['seo_image'])
             : null,
         'image_title' => $place['title'] ?? null,
+    ];
+}
+
+// Directory pages exist in sitemap only when at least one object is published.
+try {
+    $directoryEntries = seoDirectoryList(getDatabaseConnection(), 1000);
+} catch (Throwable $e) {
+    error_log('[server-seo/directory-sitemap] ' . $e->getMessage());
+    http_response_code(503);
+    header('Content-Type: text/plain; charset=utf-8');
+    header('Cache-Control: no-store');
+    header('Retry-After: 300');
+    echo 'Sitemap temporarily unavailable';
+    exit;
+}
+if ($directoryEntries) {
+    $items[] = [
+        'loc' => SEO_SITE_URL . '/directory',
+        'lastmod' => sitemapDate($directoryEntries[0]['updated_at'] ?? null),
+        'changefreq' => 'weekly', 'priority' => '0.8',
+    ];
+}
+foreach ($directoryEntries as $entry) {
+    $items[] = [
+        'loc' => SEO_SITE_URL . seoDirectoryUrl($entry),
+        'lastmod' => sitemapDate($entry['updated_at'] ?? null),
+        'changefreq' => 'weekly', 'priority' => '0.6',
     ];
 }
 

@@ -24,6 +24,7 @@ import { CategoriesPage } from "../pages/Categories/CategoriesPage.jsx";
 import { PlaceTypesPage } from "../pages/PlaceTypes/PlaceTypesPage.jsx";
 import { AttributesPage } from "../pages/Attributes/AttributesPage.jsx";
 import { DictionariesPage } from "../pages/Dictionaries/DictionariesPage.jsx";
+import { DirectoryPage } from "../pages/Directory/DirectoryPage.jsx";
 import { PlansPage } from "../pages/Plans/PlansPage.jsx";
 
 import { PaymentsPage } from "../pages/Payments/PaymentsPage.jsx";
@@ -94,6 +95,7 @@ const contentRoutes = [
     { path: "place-types", element: <PlaceTypesPage />, roles: ADMIN_ROLES },
     { path: "attributes", element: <AttributesPage />, roles: MODERATION_ROLES },
     { path: "dictionaries", element: <DictionariesPage />, roles: MODERATION_ROLES },
+    { path: "directory", element: <DirectoryPage />, roles: ADMIN_ROLES },
     { path: "plans", element: <PlansPage />, roles: ADMIN_ROLES },
 ];
 

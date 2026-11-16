@@ -1,0 +1,23 @@
+.directory-public { min-height: 85svh; padding: clamp(44px, 7vw, 90px) 20px; background: var(--color-bg-deep); color: var(--color-text); }
+.directory-public__container { width: min(1100px,100%); margin: 0 auto; }
+.directory-public__breadcrumbs { font-size: 14px; color: var(--color-text-muted); margin-bottom: 36px; }
+.directory-public a { color: var(--color-gold-light); }
+.directory-public__eyebrow { color: var(--color-gold); font-weight: 700; text-transform: uppercase; letter-spacing: .09em; font-size: 13px; }
+.directory-public h1 { font-size: clamp(38px,5vw,72px); margin: 8px 0 16px; line-height: 1.1; }
+.directory-public__lead { max-width: 850px; font-size: clamp(17px,2vw,22px); line-height: 1.65; color: var(--color-text-muted); }
+.directory-public__region { color: var(--color-gold-light); }
+.directory-public__actions { display: flex; gap: 14px; flex-wrap: wrap; margin: 24px 0 36px; }
+.directory-public__actions a, .directory-public__more { display: inline-flex; min-height: 44px; align-items: center; padding: 10px 18px; border: 1px solid var(--border-soft); border-radius: 12px; background: var(--color-surface); text-decoration: none; font-weight: 700; }
+.directory-public__grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,290px),1fr)); gap: 20px; }
+.directory-public__card { padding: 26px; border: 1px solid var(--border-soft); border-radius: 20px; background: var(--color-surface); }
+.directory-public__card h2 { margin: 10px 0 14px; }
+.directory-public__card h2 a { color: var(--color-text); text-decoration: none; }
+.directory-public__card p { line-height: 1.6; color: var(--color-text-muted); }
+.directory-public__type { font-size: 13px; color: var(--color-gold-light) !important; }
+.directory-public__read { font-weight: 700; }
+.directory-public__more { color: var(--color-paper); cursor: pointer; margin-top: 24px; font: inherit; }
+.directory-public__error, .directory-public__notice { padding: 16px; border: 1px solid var(--border-soft); border-radius: 12px; }
+.directory-public__article { max-width: 850px; line-height: 1.8; white-space: pre-line; }
+.directory-public__article h2 { font-size: 29px; }
+.directory-public__article p { margin: 15px 0; color: var(--color-text-muted); }
+.directory-public__source { margin: 28px 0; font-size: 14px; color: var(--color-text-muted); }

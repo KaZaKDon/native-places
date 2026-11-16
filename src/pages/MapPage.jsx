@@ -3,6 +3,8 @@ import { useSearchParams } from "react-router-dom";
 
 import { localitiesApi } from "../shared/api/localitiesApi";
 import { placesApi } from "../shared/api/placesApi";
+import { directoryApi } from "../shared/api/directoryApi";
+import "../features/directory/DirectoryMapGeometry.css";
 import { useMapState } from "../features/map-state/useMapState";
 import { MapBottomSheet } from "../features/map-bottom-sheet/MapBottomSheet";
 import { filterPlaces } from "../shared/map/filterPlaces";
@@ -27,9 +29,27 @@ export function MapPage() {
     const debouncedSearch = useDebouncedValue(mapState.search, 250);
 
     const [allPlaces, setAllPlaces] = useState([]);
+    const [directoryEntries, setDirectoryEntries] = useState([]);
+    const [showAds, setShowAds] = useState(true);
+    const [showDirectory, setShowDirectory] = useState(true);
+    const [directoryError, setDirectoryError] = useState("");
+    const [directoryTruncated, setDirectoryTruncated] = useState(false);
     const [placesLoading, setPlacesLoading] = useState(true);
     const [placesError, setPlacesError] = useState("");
     const [activeLocalityInfo, setActiveLocalityInfo] = useState(null);
+
+    useEffect(() => {
+        let active = true;
+        directoryApi.map().then((data) => {
+            if (!active) return;
+            setDirectoryEntries(Array.isArray(data.entries) ? data.entries : []);
+            setDirectoryTruncated(Boolean(data.truncated));
+            setDirectoryError("");
+        }).catch((error) => {
+            if (active) setDirectoryError(error.message || "Слой справочника недоступен.");
+        });
+        return () => { active = false; };
+    }, []);
 
     useEffect(() => {
         let isMounted = true;
@@ -280,12 +300,19 @@ export function MapPage() {
                 <section className="map-shell">
                     <div className="map-area">
                         <MapView
-                            places={filteredPlaces}
-                            selectedPlace={selectedPlace}
+                            places={showAds ? filteredPlaces : []}
+                            directoryEntries={showDirectory ? directoryEntries : []}
+                            selectedPlace={showAds ? selectedPlace : null}
                             hoveredPlace={hoveredPlace}
                             onSelectPlace={handleSelectPlace}
                             onHoverPlace={handleHoverPlace}
                         />
+                        <div className="map-directory-layers" aria-label="Слои карты">
+                            <label><input type="checkbox" checked={showAds} onChange={(event) => setShowAds(event.target.checked)} /> Объявления</label>
+                            <label><input type="checkbox" checked={showDirectory} onChange={(event) => setShowDirectory(event.target.checked)} /> Справочник</label>
+                            {directoryError && <p role="status">{directoryError}</p>}
+                            {directoryTruncated && <p>Показана часть справочных объектов. Полный список — в справочнике.</p>}
+                        </div>
                     </div>
 
                     <div className="map-sidebar-desktop">

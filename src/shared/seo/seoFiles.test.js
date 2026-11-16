@@ -40,3 +40,48 @@ test("HTML fallback has one canonical and crawlable default metadata", async () 
     assert.match(html, /max-image-preview:large/);
     assert.doesNotMatch(html, /href="\/favicon\.svg"/);
 });
+
+
+test("both deployable robots files are identical and allow noindex route discovery", async () => {
+    const projectRobots = await readFile("robots.txt", "utf8");
+    const publicRobots = await readFile("public/robots.txt", "utf8");
+
+    assert.equal(projectRobots, publicRobots);
+    assert.doesNotMatch(projectRobots, /Disallow: \/(auth|account|submit|routes)/);
+    assert.match(projectRobots, /Host: native-places\.ru/);
+});
+
+test("PHP server meta and SPA fallback share home title/description", async () => {
+    const fallback = await readFile("index.html", "utf8");
+    const phpConfig = await readFile("docs/seo/config.php", "utf8");
+    const clientSeo = await readFile("src/shared/seo/seoConfig.js", "utf8");
+
+    const title = "Native Places — объявления и справочник природных мест";
+    const description = "Native Places: бесплатный справочник рек и природных мест, карта, объявления о недвижимости, аренде и отдыхе. Начните с Ростовской области.";
+
+    for (const content of [fallback, phpConfig, clientSeo]) {
+        assert.ok(content.includes(title));
+        assert.ok(content.includes(description));
+    }
+});
+
+test("rewrites use a single canonical HTTPS host and fail closed on category DB errors", async () => {
+    const htaccess = await readFile(".htaccess", "utf8");
+    const router = await readFile("seo-router.php", "utf8");
+
+    assert.match(htaccess, /\^www\\\.native-places/);
+    assert.match(htaccess, /RewriteCond %\{HTTPS\} !=on/);
+    assert.match(htaccess, /https:\/\/native-places\.ru%\{REQUEST_URI\}/);
+    assert.match(router, /\[server-seo\/category\]/);
+    assert.match(router, /'robots' => 'noindex, nofollow, noarchive'/);
+    assert.match(router, /503/);
+});
+
+test("server and visible frontend home both contain category links", async () => {
+    const home = await readFile("src/pages/HomePage.jsx", "utf8");
+    const snapshot = await readFile("docs/seo/snapshots.php", "utf8");
+
+    assert.match(home, /categoryCards\.map/);
+    assert.match(home, /\/category\/\$\{category\.id\}/);
+    assert.match(snapshot, /seoCategoriesSnapshotCards\(\)/);
+});

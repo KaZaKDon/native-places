@@ -6,6 +6,7 @@ require_once __DIR__ . '/seo/config.php';
 require_once __DIR__ . '/seo/helpers.php';
 require_once __DIR__ . '/seo/data.php';
 require_once __DIR__ . '/seo/snapshots.php';
+require_once __DIR__ . '/seo/directory.php';
 
 function seoGetDatabaseConnection(): PDO
 {
@@ -141,6 +142,79 @@ if ($path === '/categories') {
     exit;
 }
 
+// A separate free information directory; only records with status=published are public.
+if ($path === '/directory') {
+    try {
+        $entries = seoDirectoryList(seoGetDatabaseConnection());
+    } catch (Throwable $error) {
+        error_log('[server-seo/directory-list] ' . $error->getMessage());
+        seoRenderAppShell(
+            ['title' => 'Справочник временно недоступен | Native Places', 'description' => 'Повторите попытку позднее.', 'canonical' => '/directory', 'robots' => 'noindex, nofollow, noarchive'],
+            seoGenericSnapshot('Временная ошибка', 'Справочник временно недоступен', 'Попробуйте позднее.'), 503
+        );
+        exit;
+    }
+    seoRenderAppShell(
+        [
+            'title' => 'Справочник рек, природных мест и достопримечательностей | Native Places',
+            'description' => 'Бесплатный справочник рек, водоёмов, природных территорий, охотничьих угодий и интересных мест. Описания и география на карте Native Places.',
+            'canonical' => '/directory',
+            'robots' => $entries ? 'index, follow, max-image-preview:large' : 'noindex, follow',
+        ],
+        seoDirectorySnapshotList($entries), 200,
+        [seoBreadcrumbs([
+            ['name' => 'Главная', 'path' => '/'],
+            ['name' => 'Справочник', 'path' => '/directory'],
+        ])]
+    );
+    exit;
+}
+
+if (preg_match('#^/directory/([a-z_]+)/([a-z0-9-]+)$#', $path, $matches)) {
+    [, $type, $slug] = $matches;
+    if (!in_array($type, ['river', 'lake', 'forest', 'natural_area', 'hunting_ground', 'landmark', 'spring'], true)) {
+        seoRenderNotFound($path);
+        exit;
+    }
+    try {
+        $entry = seoDirectoryShow(seoGetDatabaseConnection(), $type, $slug);
+    } catch (Throwable $error) {
+        error_log('[server-seo/directory-entry] ' . $error->getMessage());
+        seoRenderAppShell(
+            ['title' => 'Справочник временно недоступен | Native Places', 'description' => 'Повторите попытку позднее.', 'canonical' => $path, 'robots' => 'noindex, nofollow, noarchive'],
+            seoGenericSnapshot('Временная ошибка', 'Справочник временно недоступен', 'Попробуйте позднее.'), 503
+        );
+        exit;
+    }
+    if ($entry === null) {
+        seoRenderNotFound($path);
+        exit;
+    }
+    $description = trim((string) $entry['summary'] . ' ' . (string) ($entry['region'] ?? ''));
+    seoRenderAppShell(
+        [
+            'title' => $entry['title'] . ' — ' . seoDirectoryTypeLabel($type) . ' | Native Places',
+            'description' => $description,
+            'canonical' => $path,
+            'robots' => 'index, follow, max-image-preview:large',
+        ],
+        seoDirectorySnapshotEntry($entry), 200,
+        [
+            seoBreadcrumbs([
+                ['name' => 'Главная', 'path' => '/'],
+                ['name' => 'Справочник', 'path' => '/directory'],
+                ['name' => $entry['title'], 'path' => $path],
+            ]),
+            [
+                '@context' => 'https://schema.org', '@type' => 'Place',
+                '@id' => SEO_SITE_URL . $path . '#place', 'name' => $entry['title'],
+                'description' => $entry['summary'], 'url' => SEO_SITE_URL . $path,
+            ],
+        ]
+    );
+    exit;
+}
+
 if ($path === '/map') {
     seoRenderAppShell(
         [
@@ -179,6 +253,21 @@ if (preg_match('#^/category/([a-z0-9-]+)$#', $path, $matches)) {
         );
     } catch (Throwable $e) {
         error_log('[server-seo/category] ' . $e->getMessage());
+        seoRenderAppShell(
+            [
+                'title' => 'Категория временно недоступна | Native Places',
+                'description' => 'Не удалось загрузить объявления. Повторите попытку позже.',
+                'canonical' => $path,
+                'robots' => 'noindex, nofollow, noarchive',
+            ],
+            seoGenericSnapshot(
+                'Временная ошибка',
+                'Объявления временно недоступны',
+                'Повторите попытку через несколько минут.'
+            ),
+            503
+        );
+        exit;
     }
 
     $itemList = array_map(
@@ -212,7 +301,7 @@ if (preg_match('#^/category/([a-z0-9-]+)$#', $path, $matches)) {
                 '@context' => 'https://schema.org',
                 '@type' => 'CollectionPage',
                 '@id' => SEO_SITE_URL . $path . '#collection',
-                'name' => $category['name'],
+                'name' => $category['heading'] ?? $category['name'],
                 'description' => $category['description'],
                 'url' => SEO_SITE_URL . $path,
                 'inLanguage' => 'ru-RU',
@@ -257,10 +346,7 @@ if (preg_match('#^/place/([a-z0-9_-]+)$#', $path, $matches)) {
     }
 
     $categorySlug = seoCategoryPublicSlug((string) ($place['category_code'] ?? ''));
-    $description = seoNormalizeText(
-        $place['short_description'] ?? '',
-        seoNormalizeText($place['full_description'] ?? '', $place['category_title'] ?? '')
-    );
+    $description = seoPlaceMetaDescription($place);
     $breadcrumbs = [
         ['name' => 'Главная', 'path' => '/'],
         ['name' => 'Категории', 'path' => '/categories'],
@@ -281,13 +367,23 @@ if (preg_match('#^/place/([a-z0-9_-]+)$#', $path, $matches)) {
         'name' => $place['title'],
         'description' => $description,
         'url' => SEO_SITE_URL . $path,
-        'image' => seoNormalizeMediaUrl($place['seo_image'] ?? null),
         'address' => $place['address'] ?: ($place['locality_title'] ?? null),
         'category' => $place['category_title'] ?? null,
         'additionalType' => $place['type_title'] ?? null,
     ];
 
-    if (!empty($place['latitude']) && !empty($place['longitude'])) {
+    if (!empty($place['seo_image'])) {
+        $placeSchema['image'] = seoNormalizeMediaUrl($place['seo_image']);
+    }
+
+    if (
+        is_numeric($place['latitude'] ?? null)
+        && is_numeric($place['longitude'] ?? null)
+        && (float) $place['latitude'] >= -90
+        && (float) $place['latitude'] <= 90
+        && (float) $place['longitude'] >= -180
+        && (float) $place['longitude'] <= 180
+    ) {
         $placeSchema['geo'] = [
             '@type' => 'GeoCoordinates',
             'latitude' => (float) $place['latitude'],
@@ -297,12 +393,12 @@ if (preg_match('#^/place/([a-z0-9_-]+)$#', $path, $matches)) {
 
     seoRenderAppShell(
         [
-            'title' => $place['title'] . ' | Native Places',
+            'title' => seoPlaceMetaTitle($place),
             'description' => $description,
             'canonical' => $path,
             'image' => $place['seo_image'] ?? SEO_DEFAULT_IMAGE,
             'image_alt' => $place['title'] . ' — фотография места',
-            'type' => 'article',
+            'type' => 'website',
         ],
         seoPlaceSnapshot($place),
         200,

@@ -124,3 +124,26 @@ test("API не попадает в React Router", async ({ request }) => {
     expect(body.success).toBe(false);
     expect(body.message).toBe("Метод запроса не поддерживается");
 });
+
+
+test("robots.txt доступен и содержит динамический sitemap", async ({ request }) => {
+    const response = await request.get("/robots.txt", { maxRetries: 2 });
+    const content = await response.text();
+
+    expect(response.status()).toBe(200);
+    expect(content).toContain("Sitemap: https://native-places.ru/sitemap.xml");
+    expect(content).not.toMatch(/Disallow: \/(auth|account|submit|routes)/);
+});
+
+test("WWW указывает на один основной HTTPS-домен", async ({ playwright }) => {
+    const context = await playwright.request.newContext({ ignoreHTTPSErrors: false });
+    try {
+        const response = await context.get("https://www.native-places.ru/", {
+            maxRedirects: 0,
+        });
+        expect(response.status()).toBe(301);
+        expect(response.headers().location).toBe("https://native-places.ru/");
+    } finally {
+        await context.dispose();
+    }
+});

@@ -1,0 +1,14 @@
+.directory-geometry { display: grid; gap: var(--space-sm); min-width: 0; }
+.directory-geometry__title { font-weight: 700; }
+.directory-geometry__actions { display: flex; align-items: center; gap: var(--space-md); flex-wrap: wrap; }
+.directory-geometry__actions > span, .directory-geometry__credit { font-size: var(--font-size-xs); color: var(--color-text-secondary); }
+.directory-geometry__upload { position: relative; display: inline-flex; align-items: center; padding: 9px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); cursor: pointer; font-weight: 700; }
+.directory-geometry__upload input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+.directory-geometry__upload:focus-within { outline: 2px solid var(--color-primary); }
+.directory-geometry__preview { display: grid; gap: var(--space-sm); margin-top: 8px; }
+.directory-geometry__preview > p, .directory-geometry__credit { margin: 0; }
+.directory-geometry__error { color: var(--color-danger); margin: 0; }
+.directory-geometry__notice { color: var(--color-success); margin: 0; }
+
+.directory-form .directory-geometry__upload { display: inline-flex; }
+.directory-form .directory-geometry__upload input[type="file"] { position: absolute; width: 1px; height: 1px; padding: 0; border: 0; opacity: 0; }
