@@ -70,3 +70,5 @@ export const NotFoundPage = lazyNamedPage(
 
 export const DirectoryPage = lazyNamedPage(() => import("../pages/DirectoryPage"), "DirectoryPage");
 export const DirectoryEntryPage = lazyNamedPage(() => import("../pages/DirectoryEntryPage"), "DirectoryEntryPage");
+
+export const DirectorySpeciesPage = lazyNamedPage(() => import("../pages/DirectorySpeciesPage"), "DirectorySpeciesPage");

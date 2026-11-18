@@ -8,6 +8,9 @@ export const directoryApi = {
     show(type, slug) {
         return apiClient.get("/directory/show.php", { type, slug });
     },
+    speciesShow(slug) {
+        return apiClient.get("/directory/species/show.php", { slug });
+    },
     map() {
         return apiClient.get("/directory/map.php");
     },

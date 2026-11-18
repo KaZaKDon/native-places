@@ -4,6 +4,8 @@ import { directoryApi } from "../../shared/api/directoryApi";
 import { DIRECTORY_GROUPS, DIRECTORY_TYPES, EMPTY_ENTRY, validateDirectoryEntry } from "./directoryTypes";
 import { parseDirectoryGeoJSON } from "./geojson.js";
 import { GeoJsonEditor } from "./GeoJsonEditor.jsx";
+import { SegmentsEditor } from "./segments/SegmentsEditor.jsx";
+import { SpeciesEditor } from "./species/SpeciesEditor.jsx";
 import "./DirectoryPage.css";
 
 const toForm = (entry) => ({
@@ -17,6 +19,7 @@ export function DirectoryPage() {
     const [items, setItems] = useState([]);
     const [csrfToken, setCsrfToken] = useState("");
     const [form, setForm] = useState(null);
+    const [waterSubtab, setWaterSubtab] = useState("objects");
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [publicationId, setPublicationId] = useState(null);
@@ -47,6 +50,7 @@ export function DirectoryPage() {
 
     function changeGroup(value) {
         setGroup(value);
+        setWaterSubtab("objects");
         setForm(null);
         setError("");
         setNotice("");
@@ -138,6 +142,12 @@ export function DirectoryPage() {
                 ))}
             </div>
 
+            {group === "waters" && <div className="directory-tabs" aria-label="Подразделы рек и водоёмов">
+                <button type="button" className={waterSubtab === "objects" ? "directory-tab directory-tab--active" : "directory-tab"} onClick={() => { setWaterSubtab("objects"); setForm(null); }}>Объекты</button>
+                <button type="button" className={waterSubtab === "segments" ? "directory-tab directory-tab--active" : "directory-tab"} onClick={() => { setWaterSubtab("segments"); setForm(null); }}>Участки рек</button>
+                <button type="button" className={waterSubtab === "species" ? "directory-tab directory-tab--active" : "directory-tab"} onClick={() => { setWaterSubtab("species"); setForm(null); }}>Виды рыб</button>
+            </div>}
+            {group === "waters" && waterSubtab === "segments" ? <SegmentsEditor rivers={items.filter((item) => item.type === "river")} csrfToken={csrfToken} /> : group === "waters" && waterSubtab === "species" ? <SpeciesEditor entries={items.filter((item) => ["river", "lake"].includes(item.type))} csrfToken={csrfToken} /> : <>
             {error && <p role="alert" className="directory-message directory-message--error">{error}</p>}
             {notice && <p role="status" className="directory-message directory-message--success">{notice}</p>}
 
@@ -218,6 +228,7 @@ export function DirectoryPage() {
                     </div>
                 )}
             </div>
+            </>}
             <p className="directory-page__note">Существующий раздел «Справочники» (/dictionaries) остаётся отдельным — он хранит наборы значений, а не географические объекты.</p>
         </section>
     );

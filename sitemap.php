@@ -6,6 +6,7 @@ require_once __DIR__ . '/seo/config.php';
 require_once __DIR__ . '/seo/helpers.php';
 require_once __DIR__ . '/seo/data.php';
 require_once __DIR__ . '/seo/directory.php';
+require_once __DIR__ . '/seo/species.php';
 require_once __DIR__ . '/api/config/database.php';
 
 function sitemapDate(?string $value): string
@@ -116,6 +117,32 @@ foreach ($directoryEntries as $entry) {
         'loc' => SEO_SITE_URL . seoDirectoryUrl($entry),
         'lastmod' => sitemapDate($entry['updated_at'] ?? null),
         'changefreq' => 'weekly', 'priority' => '0.6',
+    ];
+}
+
+// Species appear in Sitemap only while fully published and linked to published evidence.
+try {
+    $publishedFish = seoSpeciesPublishedList(getDatabaseConnection(), 1000);
+} catch (Throwable $error) {
+    error_log('[server-seo/species-sitemap] ' . $error->getMessage());
+    http_response_code(503);
+    header('Content-Type: text/plain; charset=utf-8');
+    header('Cache-Control: no-store');
+    header('Retry-After: 300');
+    echo 'Sitemap temporarily unavailable';
+    exit;
+}
+foreach ($publishedFish as $fish) {
+    $imageUrl = !empty($fish['cover_image_id'])
+        ? SEO_SITE_URL . '/api/directory/image.php?id=' . (int) $fish['cover_image_id']
+        : null;
+    $items[] = [
+        'loc' => SEO_SITE_URL . '/directory/species/' . rawurlencode((string) $fish['slug']),
+        'lastmod' => sitemapDate($fish['updated_at'] ?? null),
+        'changefreq' => 'monthly',
+        'priority' => '0.5',
+        'image' => $imageUrl,
+        'image_title' => $fish['common_name'],
     ];
 }
 

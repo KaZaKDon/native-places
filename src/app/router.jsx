@@ -9,6 +9,7 @@ import {
     CategoriesPage,
     DirectoryPage,
     DirectoryEntryPage,
+    DirectorySpeciesPage,
     CategoryPage,
     HomePage,
     LegalPage,
@@ -81,6 +82,10 @@ export const router = createBrowserRouter([
             {
                 path: "directory",
                 element: withPageLoader(<DirectoryPage />),
+            },
+            {
+                path: "directory/species/:slug",
+                element: withPageLoader(<DirectorySpeciesPage />),
             },
             {
                 path: "directory/:type/:slug",

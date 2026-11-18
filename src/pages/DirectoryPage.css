@@ -21,3 +21,17 @@
 .directory-public__article h2 { font-size: 29px; }
 .directory-public__article p { margin: 15px 0; color: var(--color-text-muted); }
 .directory-public__source { margin: 28px 0; font-size: 14px; color: var(--color-text-muted); }
+
+/* v0.4c — public, source-backed species cards. */
+.directory-public__species { margin: 38px 0; }
+.directory-public__species h2 { font-size: clamp(24px,3vw,34px); }
+.directory-public__species-help { color: var(--color-text-muted); line-height: 1.7; max-width: 850px; }
+.directory-public__species-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,240px),1fr)); gap:16px; margin:20px 0; }
+.directory-public__species-card { border:1px solid var(--border-soft); background:var(--color-surface); border-radius:16px; padding:18px; overflow:hidden; }
+.directory-public__species-card img { width:100%; height:170px; object-fit:contain; background:rgba(255,255,255,.06); border-radius:10px; }
+.directory-public__species-card h3 { margin:15px 0 8px; }
+.directory-public__species-card p { line-height:1.6; color:var(--color-text-muted); }
+.directory-public__species-card a { color:var(--color-gold-light); }
+.directory-public__species-hero { max-width:640px; margin:25px 0; }
+.directory-public__species-hero img { max-width:100%; max-height:400px; width:100%; object-fit:contain; background:rgba(255,255,255,.06); border-radius:16px; }
+.directory-public__species-note { border-left:3px solid var(--color-gold); padding:6px 14px; margin:12px 0; color:var(--color-text-muted); }

@@ -1,0 +1,17 @@
+.directory-species {display:grid;gap:var(--space-lg);}
+.directory-species__top{display:flex;gap:var(--space-md);align-items:center;justify-content:space-between;flex-wrap:wrap}
+.directory-species__top p{margin:0;color:var(--color-text-secondary);max-width:800px}
+.directory-species__list{max-width:100%;overflow-x:auto}
+.directory-species__list table{width:100%;border-collapse:collapse;min-width:680px}
+.directory-species__list th,.directory-species__list td{padding:12px 10px;border-bottom:1px solid var(--color-border);text-align:left;vertical-align:middle}
+.directory-species__editor{display:grid;gap:var(--space-lg)}
+.directory-species__subsection{border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-lg);background:var(--color-surface);display:grid;gap:var(--space-md)}
+.directory-species__subsection h4{margin:0}
+.directory-species__muted{color:var(--color-text-secondary);font-size:0.9rem}
+.directory-species__photos{display:flex;flex-wrap:wrap;gap:var(--space-md)}
+.directory-species__photo{max-width:240px;display:grid;gap:5px;font-size:0.85rem}
+.directory-species__photo img{width:220px;height:150px;max-width:100%;object-fit:contain;border:1px solid var(--color-border);border-radius:var(--radius-md)}
+.directory-species__photo small{overflow-wrap:anywhere}
+.directory-species__checkbox{display:flex;align-items:flex-start;gap:10px}
+.directory-species__checkbox input{margin-top:4px;width:auto}
+.directory-species__source-help{font-size:0.9rem;color:var(--color-text-secondary)}

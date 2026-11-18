@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-const text = (path) => readFile(path, "utf8");
+// PHP executes on hosting; the local project stores PHP source mirrors under docs/backend/.
+const text = (path) => {
+    if (path.startsWith("api/")) return readFile(`docs/backend/${path.slice(4)}.md`, "utf8");
+    if (path === "seo/directory.php") return readFile("docs/seo/directory.php", "utf8");
+    return readFile(path, "utf8");
+};
 
 test("public endpoints and SEO/sitemap only read published data", async () => {
     for (const path of ["api/directory/index.php", "api/directory/show.php", "api/directory/map.php", "seo/directory.php"]) {

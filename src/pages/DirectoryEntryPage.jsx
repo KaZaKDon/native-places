@@ -49,6 +49,17 @@ export function DirectoryEntryPage() {
             <p className="directory-public__lead">{entry.summary}</p>
             <DirectoryDetailMap entry={entry} />
             <section className="directory-public__article" aria-label="Описание объекта"><h2>Об объекте</h2>{detail.map((paragraph, i) => <p key={i}>{paragraph}</p>)}</section>
+            {Array.isArray(entry.species) && entry.species.length > 0 && <section className="directory-public__species" aria-label="Виды рыб">
+                <h2>Виды рыб</h2>
+                <p className="directory-public__species-help">Сведения о присутствии видов приведены по указанным источникам и относятся к зафиксированному периоду наблюдений.</p>
+                <div className="directory-public__species-grid">{entry.species.map(fish => <article className="directory-public__species-card" key={fish.slug}>
+                    {fish.cover_image_id && <img src={`/api/directory/image.php?id=${encodeURIComponent(fish.cover_image_id)}`} alt={`${fish.common_name} — иллюстрация или фотография вида`} loading="lazy" />}
+                    <h3><Link to={`/directory/species/${fish.slug}`}>{fish.common_name}</Link></h3>
+                    {fish.scientific_name && <p><i>{fish.scientific_name}</i></p>}
+                    <p>{fish.summary}</p>
+                    <Link to={`/directory/species/${fish.slug}`}>Описание и источники</Link>
+                </article>)}</div>
+            </section>}
             {sourceUrl && <p className="directory-public__source">Источник сведений: <a href={sourceUrl} rel="noopener noreferrer" target="_blank">Открыть источник</a>. Геоданные OpenStreetMap доступны на условиях ODbL.</p>}
             <div className="directory-public__actions"><Link to="/directory">Все объекты</Link><Link to="/map">Общая карта</Link></div>
             {entry.type === "hunting_ground" && <p className="directory-public__notice">Информация о границах территории не заменяет официальные сведения о разрешениях и условиях охоты.</p>}

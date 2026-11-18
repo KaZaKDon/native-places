@@ -14,7 +14,7 @@ function seoDirectoryList(PDO $pdo, int $limit = 120): array {
     return $pdo->query("SELECT id, slug, type, title, region, summary, updated_at FROM directory_entries WHERE status='published' ORDER BY published_at DESC, id DESC LIMIT " . $limit)->fetchAll();
 }
 function seoDirectoryShow(PDO $pdo, string $type, string $slug): ?array {
-    $stmt = $pdo->prepare("SELECT slug, type, title, region, summary, body, source_url, updated_at FROM directory_entries WHERE status='published' AND type=:type AND slug=:slug LIMIT 1");
+    $stmt = $pdo->prepare("SELECT id, slug, type, title, region, summary, body, source_url, updated_at FROM directory_entries WHERE status='published' AND type=:type AND slug=:slug LIMIT 1");
     $stmt->execute(['type' => $type, 'slug' => $slug]);
     return $stmt->fetch() ?: null;
 }
@@ -38,7 +38,7 @@ function seoDirectorySnapshotList(array $entries): string {
         . seoSnapshotNavigation()
     );
 }
-function seoDirectorySnapshotEntry(array $entry): string {
+function seoDirectorySnapshotEntry(array $entry, array $species = []): string {
     $parts = preg_split('/\n\s*\n/u', str_replace("\r", '', (string) $entry['body'])) ?: [];
     $paragraphs = '';
     foreach ($parts as $part) {
@@ -50,6 +50,12 @@ function seoDirectorySnapshotEntry(array $entry): string {
     if (filter_var($source, FILTER_VALIDATE_URL) && in_array(strtolower((string) parse_url($source, PHP_URL_SCHEME)), ['https', 'http'], true)) {
         $sourceLink = '<p>Источник: <a href="' . seoHtmlEscape($source) . '" rel="noopener noreferrer">' . seoHtmlEscape($source) . '</a></p>';
     }
+    $speciesHtml = '';
+    foreach ($species as $fish) {
+        $speciesHtml .= '<li><a href="/directory/species/' . rawurlencode((string)$fish['slug']) . '">'
+            . seoHtmlEscape($fish['common_name']) . '</a> — ' . seoHtmlEscape($fish['summary']) . '</li>';
+    }
+    if ($speciesHtml !== '') $speciesHtml = '<h2>Виды рыб</h2><ul>' . $speciesHtml . '</ul>';
     return seoSnapshotLayout(
         '<p><a href="/directory">Все объекты справочника</a></p>'
         . '<p>' . seoHtmlEscape(seoDirectoryTypeLabel((string) $entry['type'])) . '</p>'
@@ -58,6 +64,7 @@ function seoDirectorySnapshotEntry(array $entry): string {
         . '<p>' . seoHtmlEscape($entry['summary']) . '</p>'
         . '<h2>Об объекте</h2>' . $paragraphs
         . $sourceLink
+        . $speciesHtml
         . seoSnapshotNavigation()
     );
 }

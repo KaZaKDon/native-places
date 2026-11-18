@@ -7,6 +7,7 @@ require_once __DIR__ . '/seo/helpers.php';
 require_once __DIR__ . '/seo/data.php';
 require_once __DIR__ . '/seo/snapshots.php';
 require_once __DIR__ . '/seo/directory.php';
+require_once __DIR__ . '/seo/species.php';
 
 function seoGetDatabaseConnection(): PDO
 {
@@ -170,6 +171,68 @@ if ($path === '/directory') {
     exit;
 }
 
+// Public species SEO pages. Only fully published species with published evidence are indexable.
+// The species route MUST be before the generic /directory/{type}/{slug} route.
+if (preg_match('#^/directory/species/([a-z0-9-]+)$#', $path, $matches)) {
+    $slug = $matches[1];
+    try {
+        $fish = seoSpeciesShow(seoGetDatabaseConnection(), $slug);
+    } catch (Throwable $error) {
+        error_log('[server-seo/species] ' . $error->getMessage());
+        seoRenderAppShell(
+            [
+                'title' => 'Справочник временно недоступен | Native Places',
+                'description' => 'Попробуйте позднее.',
+                'canonical' => $path,
+                'robots' => 'noindex, nofollow, noarchive',
+            ],
+            seoGenericSnapshot('Временная ошибка', 'Информация о виде временно недоступна', 'Попробуйте позднее.'),
+            503
+        );
+        exit;
+    }
+
+    if ($fish === null) {
+        seoRenderNotFound($path);
+        exit;
+    }
+
+    $imagePath = !empty($fish['cover_image_id'])
+        ? '/api/directory/image.php?id=' . (int) $fish['cover_image_id']
+        : SEO_DEFAULT_IMAGE;
+    $fishName = (string) $fish['common_name'];
+    seoRenderAppShell(
+        [
+            'title' => $fishName . ' (' . (string) ($fish['scientific_name'] ?: 'вид рыбы') . ') — описание | Native Places',
+            'description' => (string) $fish['summary'],
+            'canonical' => $path,
+            'robots' => 'index, follow, max-image-preview:large',
+            'image' => $imagePath,
+            'image_alt' => $fishName . ' — иллюстрация вида',
+        ],
+        seoSpeciesSnapshot($fish),
+        200,
+        [
+            seoBreadcrumbs([
+                ['name' => 'Главная', 'path' => '/'],
+                ['name' => 'Справочник', 'path' => '/directory'],
+                ['name' => $fishName, 'path' => $path],
+            ]),
+            [
+                '@context' => 'https://schema.org',
+                '@type' => 'Taxon',
+                '@id' => SEO_SITE_URL . $path . '#taxon',
+                'name' => $fishName,
+                'alternateName' => $fish['scientific_name'] ?: null,
+                'description' => $fish['summary'],
+                'url' => SEO_SITE_URL . $path,
+                'image' => SEO_SITE_URL . $imagePath,
+            ],
+        ]
+    );
+    exit;
+}
+
 if (preg_match('#^/directory/([a-z_]+)/([a-z0-9-]+)$#', $path, $matches)) {
     [, $type, $slug] = $matches;
     if (!in_array($type, ['river', 'lake', 'forest', 'natural_area', 'hunting_ground', 'landmark', 'spring'], true)) {
@@ -178,6 +241,15 @@ if (preg_match('#^/directory/([a-z_]+)/([a-z0-9-]+)$#', $path, $matches)) {
     }
     try {
         $entry = seoDirectoryShow(seoGetDatabaseConnection(), $type, $slug);
+        $fishOfEntry = [];
+        if ($entry !== null && $type === 'river') {
+            // Broken species data must not take the already published river page offline.
+            try {
+                $fishOfEntry = seoSpeciesOfEntry(seoGetDatabaseConnection(), (int) $entry['id']);
+            } catch (Throwable $error) {
+                error_log('[server-seo/river-species] ' . $error->getMessage());
+            }
+        }
     } catch (Throwable $error) {
         error_log('[server-seo/directory-entry] ' . $error->getMessage());
         seoRenderAppShell(
@@ -198,7 +270,7 @@ if (preg_match('#^/directory/([a-z_]+)/([a-z0-9-]+)$#', $path, $matches)) {
             'canonical' => $path,
             'robots' => 'index, follow, max-image-preview:large',
         ],
-        seoDirectorySnapshotEntry($entry), 200,
+        seoDirectorySnapshotEntry($entry, $fishOfEntry), 200,
         [
             seoBreadcrumbs([
                 ['name' => 'Главная', 'path' => '/'],
