@@ -1,3 +1,9 @@
+# Native Places — handoff 19.11.2026: v0.4d подготовлена
+
+**Production:** v0.4c.1 проверена, `/directory/species/okun-rechnoy` = HTTP 200, Sitemap содержит 13 страниц и окуня; Дон ссылается на вид. **Следующая установка:** v0.4d из `RELEASE_v04d_TERRITORIES.md`; SQL до PHP, сверка текущей папки API на хосте обязательна. Два черновика ООПТ в `OOPT_DRAFT_CARDS_v04d.md`, без геометрии и публикации. PHP lint и сборки нового патча пока не выполнены. Ниже — исторический handoff v0.4c.1 до установки.
+
+---
+
 # Native Places — актуальный handoff, 18.11.2026, SEO hotfix v0.4c.1
 
 **Следующее действие — установить только два файла из HOST ZIP v0.4c.1 после сверки/резервного копирования:** `seo-router.php` и `sitemap.php` в корень сайта. Затем выполнить одну проверку `curl.exe -sS -o NUL -w "HTTP %{http_code}\n" https://native-places.ru/directory/species/okun-rechnoy`. Ожидаемый ответ: 200. Если не 200, не продолжать и сравнить файлы на хостинге. SOURCE ZIP — синхронные локальные файлы, тест и документация, без React-сборки.

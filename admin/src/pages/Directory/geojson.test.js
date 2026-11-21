@@ -46,3 +46,8 @@ test("rejects unsupported geometry collections and multiple point markers", () =
 test("enforces JSON byte limit before parsing", () => {
     assert.throws(() => parseDirectoryGeoJSON(" ".repeat(250001), "river"), /250 КБ/);
 });
+test("protected territories accept only closed polygon boundaries", () => {
+    const polygon = { type: "Polygon", coordinates: [[[41, 47], [42, 47], [42, 48], [41, 47]]] };
+    assert.equal(parseDirectoryGeoJSON(polygon, "protected_area").geometry.type, "Polygon");
+    assert.throws(() => parseDirectoryGeoJSON({ type: "Point", coordinates: [41, 47] }, "protected_area"));
+});

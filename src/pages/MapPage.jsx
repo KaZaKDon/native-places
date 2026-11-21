@@ -310,6 +310,7 @@ export function MapPage() {
                         <div className="map-directory-layers" aria-label="Слои карты">
                             <label><input type="checkbox" checked={showAds} onChange={(event) => setShowAds(event.target.checked)} /> Объявления</label>
                             <label><input type="checkbox" checked={showDirectory} onChange={(event) => setShowDirectory(event.target.checked)} /> Справочник</label>
+                            {showDirectory && <p className="map-directory-layers__legend"><span className="map-directory-layers__key map-directory-layers__key--protected" /> ООПТ <span className="map-directory-layers__key map-directory-layers__key--hunting" /> Охотугодья</p>}
                             {directoryError && <p role="status">{directoryError}</p>}
                             {directoryTruncated && <p>Показана часть справочных объектов. Полный список — в справочнике.</p>}
                         </div>

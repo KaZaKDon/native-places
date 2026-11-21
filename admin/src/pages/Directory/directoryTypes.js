@@ -15,6 +15,7 @@ export const DIRECTORY_GROUPS = [
         types: [
             { value: "forest", label: "Лес" },
             { value: "natural_area", label: "Природная территория" },
+            { value: "protected_area", label: "Заповедник или ООПТ" },
         ],
     },
     {
@@ -46,6 +47,14 @@ export const EMPTY_ENTRY = {
     body: "",
     source_url: "",
     geometry_geojson: "",
+    official_category: "",
+    official_name: "",
+    managing_body: "",
+    legal_basis_url: "",
+    boundary_source_url: "",
+    access_rules: "",
+    access_source_url: "",
+    checked_at: "",
 };
 
 export function validateDirectoryEntry(entry) {
@@ -63,6 +72,21 @@ export function validateDirectoryEntry(entry) {
             parseDirectoryGeoJSON(entry.geometry_geojson, entry.type);
         } catch (error) {
             errors.push(error.message);
+        }
+    }
+    if (["protected_area", "hunting_ground"].includes(entry.type)) {
+        for (const field of ["official_name", "managing_body", "legal_basis_url", "boundary_source_url", "access_rules", "access_source_url", "checked_at"]) {
+            if (typeof entry[field] !== "string") errors.push(`Некорректное поле: ${field}.`);
+        }
+        if (entry.type === "protected_area" && entry.official_category && !["zapovednik", "zakaznik", "national_park", "natural_park", "nature_monument", "other"].includes(entry.official_category)) {
+            errors.push("Укажите категорию ООПТ.");
+        }
+        for (const field of ["legal_basis_url", "boundary_source_url", "access_source_url"]) {
+            if (entry[field] && !/^https?:\/\/[^\s]+$/i.test(entry[field])) errors.push(`Укажите HTTP(S)-ссылку: ${field}.`);
+        }
+        const limits = { official_name: 180, managing_body: 180, legal_basis_url: 700, boundary_source_url: 700, access_rules: 5000, access_source_url: 700 };
+        for (const [field, limit] of Object.entries(limits)) {
+            if (typeof entry[field] === "string" && entry[field].length > limit) errors.push(`Поле ${field} слишком длинное.`);
         }
     }
     return errors;

@@ -11,10 +11,12 @@ function featureStyle(type) {
         water: root?.getPropertyValue("--directory-river").trim() || "#258ad0",
         nature: root?.getPropertyValue("--directory-nature").trim() || "#619c70",
         hunting: root?.getPropertyValue("--directory-hunting").trim() || "#b68e4e",
+        protected: root?.getPropertyValue("--directory-protected").trim() || "#8b5cf6",
     };
     if (type === "river") return { color: palette.water, weight: 5, opacity: 0.95 };
     if (type === "lake") return { color: palette.water, weight: 3, fillColor: palette.water, fillOpacity: 0.22 };
     if (type === "hunting_ground") return { color: palette.hunting, weight: 3, fillColor: palette.hunting, fillOpacity: 0.18 };
+    if (type === "protected_area") return { color: palette.protected, weight: 3, fillColor: palette.protected, fillOpacity: 0.14 };
     return { color: palette.nature, weight: 3, fillColor: palette.nature, fillOpacity: 0.2 };
 }
 

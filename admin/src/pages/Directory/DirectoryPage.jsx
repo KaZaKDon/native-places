@@ -6,12 +6,21 @@ import { parseDirectoryGeoJSON } from "./geojson.js";
 import { GeoJsonEditor } from "./GeoJsonEditor.jsx";
 import { SegmentsEditor } from "./segments/SegmentsEditor.jsx";
 import { SpeciesEditor } from "./species/SpeciesEditor.jsx";
+import { TerritoryFields } from "./TerritoryFields.jsx";
 import "./DirectoryPage.css";
 
 const toForm = (entry) => ({
     ...EMPTY_ENTRY,
     ...entry,
     geometry_geojson: entry.geometry_geojson || "",
+    official_category: entry.official_category || "",
+    official_name: entry.official_name || "",
+    managing_body: entry.managing_body || "",
+    legal_basis_url: entry.legal_basis_url || "",
+    boundary_source_url: entry.boundary_source_url || "",
+    access_rules: entry.access_rules || "",
+    access_source_url: entry.access_source_url || "",
+    checked_at: entry.checked_at || "",
 });
 
 export function DirectoryPage() {
@@ -147,7 +156,11 @@ export function DirectoryPage() {
                 <button type="button" className={waterSubtab === "segments" ? "directory-tab directory-tab--active" : "directory-tab"} onClick={() => { setWaterSubtab("segments"); setForm(null); }}>Участки рек</button>
                 <button type="button" className={waterSubtab === "species" ? "directory-tab directory-tab--active" : "directory-tab"} onClick={() => { setWaterSubtab("species"); setForm(null); }}>Виды рыб</button>
             </div>}
-            {group === "waters" && waterSubtab === "segments" ? <SegmentsEditor rivers={items.filter((item) => item.type === "river")} csrfToken={csrfToken} /> : group === "waters" && waterSubtab === "species" ? <SpeciesEditor entries={items.filter((item) => ["river", "lake"].includes(item.type))} csrfToken={csrfToken} /> : <>
+            {["nature", "hunting"].includes(group) && <div className="directory-tabs" aria-label="Подразделы территорий">
+                <button type="button" className={waterSubtab === "objects" ? "directory-tab directory-tab--active" : "directory-tab"} onClick={() => { setWaterSubtab("objects"); setForm(null); }}>Территории</button>
+                <button type="button" className={waterSubtab === "species" ? "directory-tab directory-tab--active" : "directory-tab"} onClick={() => { setWaterSubtab("species"); setForm(null); }}>Животные и птицы</button>
+            </div>}
+            {group === "waters" && waterSubtab === "segments" ? <SegmentsEditor rivers={items.filter((item) => item.type === "river")} csrfToken={csrfToken} /> : waterSubtab === "species" && ["waters", "nature", "hunting"].includes(group) ? <SpeciesEditor key={group === "waters" ? "fish" : "fauna"} mode={group === "waters" ? "fish" : "fauna"} entries={items.filter((item) => (group === "waters" ? ["river", "lake"] : ["protected_area", "hunting_ground"]).includes(item.type))} csrfToken={csrfToken} /> : <>
             {error && <p role="alert" className="directory-message directory-message--error">{error}</p>}
             {notice && <p role="status" className="directory-message directory-message--success">{notice}</p>}
 
@@ -194,6 +207,7 @@ export function DirectoryPage() {
                         <div className="directory-form__wide">
                             <GeoJsonEditor type={form.type} value={form.geometry_geojson} onChange={(value) => updateField("geometry_geojson", value)} disabled={saving} />
                         </div>
+                        <TerritoryFields form={form} updateField={updateField} />
                     </div>
                     <button className="directory-action directory-action--primary" type="submit" disabled={saving}>{saving ? "Сохраняем…" : "Сохранить черновик"}</button>
                 </form>

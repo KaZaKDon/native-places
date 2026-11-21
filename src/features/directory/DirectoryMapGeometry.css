@@ -4,4 +4,8 @@
 .map-directory-layers label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
 .map-directory-layers input { accent-color: var(--color-gold); }
 .map-directory-layers p { max-width: 245px; margin: 0; font-size: 11px; color: var(--color-text-muted); }
+.map-directory-layers__legend { display: flex; align-items: center; gap: 6px; }
+.map-directory-layers__key { width: 13px; height: 13px; border-radius: 3px; border: 2px solid; display: inline-block; margin-left: 4px; }
+.map-directory-layers__key--protected { border-color: var(--directory-protected); }
+.map-directory-layers__key--hunting { border-color: var(--directory-hunting); }
 @media(max-width:860px) { .map-directory-layers { top: 68px; left: 14px; padding: 8px 10px; } }

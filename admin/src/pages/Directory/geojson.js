@@ -9,6 +9,7 @@ const GEOMETRY_BY_TYPE = {
     forest: ["Polygon", "MultiPolygon"],
     natural_area: ["Polygon", "MultiPolygon"],
     hunting_ground: ["Polygon", "MultiPolygon"],
+    protected_area: ["Polygon", "MultiPolygon"],
     landmark: ["Point"],
     spring: ["Point"],
 };

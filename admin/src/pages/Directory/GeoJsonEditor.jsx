@@ -52,7 +52,7 @@ export function GeoJsonEditor({ type, value, onChange, disabled }) {
             {inspection.parsed && (
                 <div className="directory-geometry__preview">
                     <p><strong>Проверка геометрии:</strong> {inspection.parsed.geometry.type}; координат: {inspection.parsed.pointCount}; участков/областей: {inspection.parsed.partCount}.</p>
-                    <GeoPreviewMap geometry={inspection.parsed.geometry} bounds={inspection.parsed.bounds} />
+                    <GeoPreviewMap type={type} geometry={inspection.parsed.geometry} bounds={inspection.parsed.bounds} />
                 </div>
             )}
             <p className="directory-geometry__credit">Укажите ссылку на источник геоданных в поле выше. Используйте только проверенные данные и соблюдайте лицензию источника (например, ODbL для OSM).</p>

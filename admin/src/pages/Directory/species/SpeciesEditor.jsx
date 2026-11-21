@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { directorySegmentsApi, directorySpeciesApi } from '../../../shared/api/directoryApi';
-import { EMPTY_SPECIES, EMPTY_OCCURRENCE, EMPTY_PHOTO, EMPTY_SOURCE, PHOTO_ORIGINS, EVIDENCE_LEVELS, validateSpecies, validateOccurrence, validatePhoto } from './speciesModel.js';
+import { EMPTY_SPECIES, EMPTY_OCCURRENCE, EMPTY_PHOTO, EMPTY_SOURCE, PHOTO_ORIGINS, EVIDENCE_LEVELS, SPECIES_KINDS, validateSpecies, validateOccurrence, validatePhoto } from './speciesModel.js';
 import './SpeciesEditor.css';
 
 const asDate = () => new Date().toLocaleDateString('sv-SE');
 
-export function SpeciesEditor({ entries, csrfToken }) {
+export function SpeciesEditor({ entries, csrfToken, mode = 'fish' }) {
     const [species, setSpecies] = useState([]);
     const [sources, setSources] = useState([]);
     const [selectedId, setSelectedId] = useState('');
@@ -47,7 +47,8 @@ export function SpeciesEditor({ entries, csrfToken }) {
     }, [selectedId]);
 
     const selected = useMemo(() => species.find(s => String(s.id) === String(selectedId)), [species,selectedId]);
-    const riverEntries = useMemo(() => entries.filter(e => ['river','lake'].includes(e.type)), [entries]);
+    const riverEntries = useMemo(() => entries.filter(e => mode === 'fish' ? ['river','lake'].includes(e.type) : ['protected_area','hunting_ground'].includes(e.type)), [entries, mode]);
+    const visibleSpecies = species.filter(s => mode === 'fish' ? s.kind === 'fish' : ['bird','mammal'].includes(s.kind));
     const evidenceSourceKind = {official:'official',research:'scientific',verified_observation:'observation'};
 
     useEffect(() => {
@@ -106,7 +107,7 @@ export function SpeciesEditor({ entries, csrfToken }) {
                 source_id:Number(occurrenceForm.source_id) }, csrfToken);
             const res = await directorySpeciesApi.occurrences(selectedId);
             setOccurrences(res.occurrences || []); setOccurrenceForm(null);
-            setMessage('Черновик связи вида с рекой/участком сохранён. Он не виден посетителям.');
+            setMessage('Черновик связи вида с природным объектом сохранён. Он не виден посетителям.');
         } catch (e) { setError(e.message); }
         finally { setBusy(false); }
     }
@@ -158,37 +159,38 @@ export function SpeciesEditor({ entries, csrfToken }) {
 
     return <section className="directory-species">
         <div className="directory-species__top">
-            <div><h3>Виды рыб</h3><p>Единая база видов. Присутствие в реке или на участке указывается отдельно и только с источником подтверждения. Публикация выполняется отдельно после проверки описания, источников и изображений.</p></div>
-            <button type="button" className="directory-action directory-action--primary" disabled={!csrfToken || loading || busy} onClick={() => {setForm({...EMPTY_SPECIES});clearFeedback();}}>Добавить вид рыбы</button>
+            <div><h3>{mode === 'fish' ? 'Виды рыб' : 'Животные и птицы'}</h3><p>Единая база видов. Присутствие в конкретном объекте указывается отдельно и только с источником подтверждения. {mode === 'fauna' && 'Список видов не определяет право на охоту. '}Публикация выполняется после проверки описания, источников и изображений.</p></div>
+            <button type="button" className="directory-action directory-action--primary" disabled={!csrfToken || loading || busy} onClick={() => {setForm({...EMPTY_SPECIES,kind:mode === 'fish' ? 'fish' : 'mammal'});clearFeedback();}}>Добавить вид</button>
         </div>
         {error && <p role="alert" className="directory-message directory-message--error">{error}</p>}
         {message && <p role="status" className="directory-message directory-message--success">{message}</p>}
         {form && <form className="directory-form" onSubmit={saveSpecies}>
-            <div className="directory-form__heading"><h3>{form.id ? `Редактировать вид №${form.id}`:'Новый вид рыбы'}</h3><button className="directory-action" type="button" disabled={busy} onClick={()=>setForm(null)}>Закрыть</button></div>
+            <div className="directory-form__heading"><h3>{form.id ? `Редактировать вид №${form.id}`:'Новый вид'}</h3><button className="directory-action" type="button" disabled={busy} onClick={()=>setForm(null)}>Закрыть</button></div>
             <div className="directory-form__grid">
-                <label>Название *<input required maxLength={180} value={form.common_name} onChange={e=>update(setForm,'common_name',e.target.value)} placeholder="Например, окунь"/></label>
-                <label>Slug *<input required maxLength={160} value={form.slug} onChange={e=>update(setForm,'slug',e.target.value.toLowerCase())} placeholder="okun"/></label>
+                {mode === 'fauna' && <label>Группа вида *<select value={form.kind} onChange={e=>update(setForm,'kind',e.target.value)}>{SPECIES_KINDS.filter(k=>['bird','mammal'].includes(k.value)).map(k=><option key={k.value} value={k.value}>{k.label}</option>)}</select></label>}
+                <label>Название *<input required maxLength={180} value={form.common_name} onChange={e=>update(setForm,'common_name',e.target.value)} placeholder={mode === 'fish' ? 'Например, окунь' : form.kind === 'bird' ? 'Например, журавль' : 'Например, лось'}/></label>
+                <label>Slug *<input required maxLength={160} value={form.slug} onChange={e=>update(setForm,'slug',e.target.value.toLowerCase())} placeholder={mode === 'fish' ? 'okun' : form.kind === 'bird' ? 'zhuravl' : 'los'}/></label>
                 <label className="directory-form__wide">Научное название (только проверенное)<input maxLength={180} value={form.scientific_name || ''} onChange={e=>update(setForm,'scientific_name',e.target.value)} placeholder="Необязательно для черновика"/></label>
                 <label className="directory-form__wide">Краткое описание<textarea rows={3} maxLength={500} value={form.summary} onChange={e=>update(setForm,'summary',e.target.value)}/></label>
                 <label className="directory-form__wide">Подробные сведения<textarea rows={5} maxLength={10000} value={form.body} onChange={e=>update(setForm,'body',e.target.value)}/></label>
             </div>
             <button type="submit" disabled={busy} className="directory-action directory-action--primary">{busy?'Сохраняем…':'Сохранить черновик вида'}</button>
         </form>}
-        <div className="directory-list directory-species__list">{loading ? <p>Загружаем виды…</p> : species.filter(s => s.kind === 'fish').length === 0 ? <p>Пока нет видов рыб. Создайте первый черновик.</p> : <table>
+        <div className="directory-list directory-species__list">{loading ? <p>Загружаем виды…</p> : visibleSpecies.length === 0 ? <p>В этой группе видов пока нет. Создайте первый черновик.</p> : <table>
             <thead><tr><th>Вид</th><th>Научное название</th><th>Статус</th><th>Действие</th></tr></thead>
-            <tbody>{species.filter(s=>s.kind==='fish').map(s=><tr key={s.id}><td><strong>{s.common_name}</strong><div className="directory-species__muted">/{s.slug}</div></td><td>{s.scientific_name || '—'}</td><td>{s.status==='published' ? 'Опубликован' : 'Черновик'}</td><td><button type="button" className="directory-action" onClick={()=>choose(s.id)}>Открыть</button></td></tr>)}</tbody>
+            <tbody>{visibleSpecies.map(s=><tr key={s.id}><td><strong>{s.common_name}</strong><div className="directory-species__muted">/{s.slug} · {SPECIES_KINDS.find(k=>k.value===s.kind)?.label}</div></td><td>{s.scientific_name || '—'}</td><td>{s.status==='published' ? 'Опубликован' : 'Черновик'}</td><td><button type="button" className="directory-action" onClick={()=>choose(s.id)}>Открыть</button></td></tr>)}</tbody>
         </table>}</div>
         {selected && <div className="directory-species__editor">
-            <div className="directory-species__subsection"><div className="directory-species__top"><div><h3>{selected.common_name}</h3><p>{selected.status==='published' ? 'Вид опубликован. Для редактирования сначала снимите его с публикации.' : 'Вид — черновик. Для публикации необходимы содержательное описание, подтверждённая привязка и изображение.'} Сведения о встречаемости не распространяются автоматически на все участки.</p></div><button type="button" className="directory-action" disabled={selected.status!=='draft'} onClick={()=>{setForm({...EMPTY_SPECIES,...selected});clearFeedback();}}>Редактировать описание</button><button type="button" className="directory-action directory-action--primary" disabled={busy || !csrfToken} onClick={()=>setPublication(selected)}>{selected.status==='published' ? 'Снять с публикации' : 'Опубликовать вид'}</button>{selected.status==='published' && <a href={`/directory/species/${selected.slug}`} target="_blank" rel="noopener noreferrer">Публичная карточка</a>}</div></div>
+            <div className="directory-species__subsection"><div className="directory-species__top"><div><h3>{selected.common_name}</h3><p>{selected.status==='published' ? 'Вид опубликован. Для редактирования сначала снимите его с публикации.' : 'Вид — черновик. Для публикации необходимы содержательное описание, подтверждённая привязка и изображение.'} {mode === 'fish' ? 'Сведения о встречаемости не распространяются автоматически на все участки.' : 'Сведения о встречаемости не распространяются автоматически на другие территории.'}</p></div><button type="button" className="directory-action" disabled={selected.status!=='draft'} onClick={()=>{setForm({...EMPTY_SPECIES,...selected});clearFeedback();}}>Редактировать описание</button><button type="button" className="directory-action directory-action--primary" disabled={busy || !csrfToken} onClick={()=>setPublication(selected)}>{selected.status==='published' ? 'Снять с публикации' : 'Опубликовать вид'}</button>{selected.status==='published' && <a href={`/directory/species/${selected.slug}`} target="_blank" rel="noopener noreferrer">Публичная карточка</a>}</div></div>
             <div className="directory-species__subsection">
-                <div className="directory-species__top"><h4>Где встречается (подтверждённые сведения)</h4><button type="button" className="directory-action" disabled={busy || selected.status!=='draft'} onClick={()=>{setOccurrenceForm({...EMPTY_OCCURRENCE,species_id:String(selectedId),verified_at:asDate()});setSegments([]);clearFeedback();}}>Привязать к реке или участку</button></div>
-                {occurrences.length===0 ? <p className="directory-species__muted">Пока нет записей о встречаемости. Никаких предположений добавлять не будем.</p> : <div className="directory-species__list"><table><thead><tr><th>Река / водоём</th><th>Участок</th><th>Источник</th><th>Проверено</th><th>Действие</th></tr></thead><tbody>{occurrences.map(o=><tr key={o.id}><td>{o.entry_title}</td><td>{o.segment_title || 'В целом по объекту'}</td><td>{o.source_title}</td><td>{o.verified_at}</td><td><button className="directory-action" type="button" disabled={selected.status!=='draft'} onClick={()=>{setOccurrenceForm({...EMPTY_OCCURRENCE,...o,entry_id:String(o.entry_id),segment_id:String(o.segment_id || ''),source_id:String(o.source_id)});clearFeedback();}}>Редактировать</button> <button className="directory-action" type="button" disabled={busy || selected.status!=='draft'} onClick={()=>deleteOccurrence(o)}>Удалить</button></td></tr>)}</tbody></table></div>}
+                <div className="directory-species__top"><h4>Где встречается (подтверждённые сведения)</h4><button type="button" className="directory-action" disabled={busy || selected.status!=='draft'} onClick={()=>{setOccurrenceForm({...EMPTY_OCCURRENCE,species_id:String(selectedId),verified_at:asDate()});setSegments([]);clearFeedback();}}>{mode === 'fish' ? 'Привязать к реке или участку' : 'Привязать к территории'}</button></div>
+                {occurrences.length===0 ? <p className="directory-species__muted">Пока нет записей о встречаемости. Никаких предположений добавлять не будем.</p> : <div className="directory-species__list"><table><thead><tr><th>Природный объект</th><th>Участок</th><th>Источник</th><th>Проверено</th><th>Действие</th></tr></thead><tbody>{occurrences.map(o=><tr key={o.id}><td>{o.entry_title}</td><td>{o.segment_title || 'В целом по объекту'}</td><td>{o.source_title}</td><td>{o.verified_at}</td><td><button className="directory-action" type="button" disabled={selected.status!=='draft'} onClick={()=>{setOccurrenceForm({...EMPTY_OCCURRENCE,...o,entry_id:String(o.entry_id),segment_id:String(o.segment_id || ''),source_id:String(o.source_id)});clearFeedback();}}>Редактировать</button> <button className="directory-action" type="button" disabled={busy || selected.status!=='draft'} onClick={()=>deleteOccurrence(o)}>Удалить</button></td></tr>)}</tbody></table></div>}
                 {occurrenceForm && <form className="directory-form" onSubmit={saveOccurrence}><div className="directory-form__heading"><h4>Связь вида с природным объектом</h4><button className="directory-action" type="button" onClick={()=>setOccurrenceForm(null)}>Закрыть</button></div><div className="directory-form__grid">
-                    <label>Река / водоём *<select required value={occurrenceForm.entry_id} onChange={e=>setOccurrenceForm(o=>({...o,entry_id:e.target.value,segment_id:''}))}><option value="">Выберите объект</option>{riverEntries.map(r=><option key={r.id} value={r.id}>{r.title} — {r.region}</option>)}</select></label>
-                    <label>Участок (необязательный)<select value={occurrenceForm.segment_id} onChange={e=>update(setOccurrenceForm,'segment_id',e.target.value)} disabled={!riverEntries.find(e=>String(e.id)===String(occurrenceForm.entry_id) && e.type==='river')}><option value="">Только связь с рекой целиком</option>{segments.map(s=><option key={s.id} value={s.id}>{s.title} ({s.status})</option>)}</select></label>
+                    <label>{mode === 'fish' ? 'Река / водоём' : 'ООПТ / охотугодье'} *<select required value={occurrenceForm.entry_id} onChange={e=>setOccurrenceForm(o=>({...o,entry_id:e.target.value,segment_id:''}))}><option value="">Выберите объект</option>{riverEntries.map(r=><option key={r.id} value={r.id}>{r.title} — {r.region}</option>)}</select></label>
+                    {mode === 'fish' && <label>Участок (необязательный)<select value={occurrenceForm.segment_id} onChange={e=>update(setOccurrenceForm,'segment_id',e.target.value)} disabled={!riverEntries.find(e=>String(e.id)===String(occurrenceForm.entry_id) && e.type==='river')}><option value="">Только связь с рекой целиком</option>{segments.map(s=><option key={s.id} value={s.id}>{s.title} ({s.status})</option>)}</select></label>}
                     <label>Степень подтверждения *<select value={occurrenceForm.evidence_level} onChange={e=>setOccurrenceForm(o=>({...o,evidence_level:e.target.value,source_id:''}))}>{EVIDENCE_LEVELS.map(k=><option key={k.value} value={k.value}>{k.label}</option>)}</select></label>
                     <label>Дата проверки *<input required type="date" value={occurrenceForm.verified_at} onChange={e=>update(setOccurrenceForm,'verified_at',e.target.value)}/></label>
-                    <label className="directory-form__wide">Источник факта о рыбе *<select required value={occurrenceForm.source_id} onChange={e=>update(setOccurrenceForm,'source_id',e.target.value)}><option value="">Выберите источник (карта OSM не подтверждает рыбу)</option>{sources.filter(s => s.source_kind === evidenceSourceKind[occurrenceForm.evidence_level]).map(s=><option key={s.id} value={s.id}>{s.title} — {s.accessed_at}</option>)}</select></label>
+                    <label className="directory-form__wide">Источник факта о виде *<select required value={occurrenceForm.source_id} onChange={e=>update(setOccurrenceForm,'source_id',e.target.value)}><option value="">Выберите источник (карта OSM не подтверждает присутствие вида)</option>{sources.filter(s => s.source_kind === evidenceSourceKind[occurrenceForm.evidence_level]).map(s=><option key={s.id} value={s.id}>{s.title} — {s.accessed_at}</option>)}</select></label>
                     <div className="directory-form__wide"><button className="directory-action" type="button" onClick={()=>{setSourceForm({...EMPTY_SOURCE,accessed_at:asDate()});clearFeedback();}}>Добавить источник</button></div>
                     <label className="directory-form__wide">Примечание / точность сведений<textarea maxLength={2000} rows={3} value={occurrenceForm.notes} onChange={e=>update(setOccurrenceForm,'notes',e.target.value)}/></label>
                 </div><button type="submit" disabled={busy} className="directory-action directory-action--primary">Сохранить черновик связи</button></form>}
@@ -214,7 +216,7 @@ export function SpeciesEditor({ entries, csrfToken }) {
                         <label className="directory-form__wide">Происхождение изображения *<select value={photoForm.image_origin} onChange={e=>update(setPhotoForm,'image_origin',e.target.value)}>{PHOTO_ORIGINS.map(item=><option key={item.value} value={item.value}>{item.label}</option>)}</select></label>
                         {photoForm.image_origin === 'ai_generated' ? <>
                             <label className="directory-form__wide">Инструмент ИИ-генерации *<input required value={photoForm.ai_tool} maxLength={190} onChange={e=>update(setPhotoForm,'ai_tool',e.target.value)} placeholder="Например, ChatGPT (OpenAI)"/></label>
-                            <p className="directory-form__wide directory-species__source-help">Отдельная лицензия на чужую фотографию не нужна, если изображение действительно было сгенерировано ИИ и у вас есть право его разместить. В карточке оно будет помечено как ИИ-иллюстрация, а не документальный снимок рыбы.</p>
+                            <p className="directory-form__wide directory-species__source-help">Отдельная лицензия на чужую фотографию не нужна, если изображение действительно было сгенерировано ИИ и у вас есть право его разместить. В карточке оно будет помечено как ИИ-иллюстрация, а не документальный снимок вида.</p>
                         </> : <>
                             <label>Автор *<input required value={photoForm.author} maxLength={250} onChange={e=>update(setPhotoForm,'author',e.target.value)}/></label>
                             <label>Лицензия / основание использования *<input required value={photoForm.license_name} maxLength={180} onChange={e=>update(setPhotoForm,'license_name',e.target.value)} placeholder="Например, собственное фото"/></label>

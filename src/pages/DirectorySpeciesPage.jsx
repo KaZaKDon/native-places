@@ -28,9 +28,10 @@ export function DirectorySpeciesPage() {
         <main className="directory-public"><div className="directory-public__container"><h1>Вид не найден</h1><p>{error}</p><Link to="/directory">К справочнику</Link></div></main>
     </>;
     const path = `/directory/species/${fish.slug}`;
+    const kindLabel = {fish:"Виды рыб",bird:"Птицы",mammal:"Млекопитающие"}[fish.kind] || "Виды природы";
     const paragraphs = (fish.body || "").split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean);
     return <>
-        <Seo title={`${fish.common_name} (${fish.scientific_name || "вид рыбы"}) — описание | Native Places`}
+        <Seo title={`${fish.common_name} (${fish.scientific_name || "вид природы"}) — описание | Native Places`}
             description={fish.summary} canonical={path}
             image={fish.cover_image_id ? `${SITE_URL}/api/directory/image.php?id=${fish.cover_image_id}` : undefined}
             structuredData={[
@@ -40,14 +41,14 @@ export function DirectorySpeciesPage() {
         />
         <main className="directory-public"><article className="directory-public__container directory-public__detail">
             <nav className="directory-public__breadcrumbs"><Link to="/">Главная</Link> / <Link to="/directory">Справочник</Link> / {fish.common_name}</nav>
-            <p className="directory-public__eyebrow">Виды рыб · Бесплатный справочник</p>
+            <p className="directory-public__eyebrow">{kindLabel} · Бесплатный справочник</p>
             <h1>{fish.common_name}</h1>
             {fish.scientific_name && <p className="directory-public__region"><i>{fish.scientific_name}</i></p>}
             <p className="directory-public__lead">{fish.summary}</p>
             {fish.cover_image_id && <figure className="directory-public__species-hero"><img src={`/api/directory/image.php?id=${encodeURIComponent(fish.cover_image_id)}`} alt={record.cover?.alt_text || `${fish.common_name} — изображение вида`}/><figcaption>{record.cover?.caption || fish.common_name}. {record.cover?.author?.startsWith("ИИ: ") ? `ИИ-иллюстрация, инструмент: ${record.cover.author.slice(4)}.` : (record.cover?.author ? `Автор: ${record.cover.author}.` : "")}{record.cover?.license_name ? ` Основание использования: ${record.cover.license_name}.` : ""}</figcaption></figure>}
             <section className="directory-public__article"><h2>Описание вида</h2>{paragraphs.map((p,i)=><p key={i}>{p}</p>)}</section>
             {Array.isArray(record.occurrences) && record.occurrences.length > 0 && <section className="directory-public__species"><h2>Где отмечен вид</h2>
-                <p className="directory-public__species-help">Сведения относятся к конкретным источникам и периодам наблюдения, а не гарантируют наличие рыбы в любой момент.</p>
+                <p className="directory-public__species-help">Сведения относятся к конкретным источникам и периодам наблюдения. Они не гарантируют присутствия вида сегодня и не определяют правила охоты.</p>
                 {record.occurrences.map((o,i)=><div className="directory-public__species-note" key={`${o.entry_slug}-${i}`}>
                     <Link to={`/directory/${o.type}/${o.entry_slug}`}>{o.entry_title}</Link>{o.region ? ` · ${o.region}` : ""}{o.segment_title ? ` · ${o.segment_title}` : ""}
                     <p>{evidenceTitle[o.evidence_level] || "Сведения из источника"}: {o.source_title}.</p>

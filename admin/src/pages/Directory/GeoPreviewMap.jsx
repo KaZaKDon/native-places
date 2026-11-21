@@ -10,7 +10,7 @@ function pathForLine(line, project, close = false) {
     return `M ${points.join(" L ")}${close ? " Z" : ""}`;
 }
 
-export function GeoPreviewMap({ geometry, bounds }) {
+export function GeoPreviewMap({ type, geometry, bounds }) {
     const viewRef = useRef(null);
     const [viewport, setViewport] = useState({ width: 700, height: 390 });
     const [zoomChange, setZoomChange] = useState(0);
@@ -45,7 +45,7 @@ export function GeoPreviewMap({ geometry, bounds }) {
     }, [geometry, bounds, viewport, zoomChange]);
 
     return (
-        <section className="directory-map" aria-label="Предварительный просмотр геометрии на карте OpenStreetMap">
+        <section className={`directory-map directory-map--${type}`} aria-label="Предварительный просмотр геометрии на карте OpenStreetMap">
             <div className="directory-map__canvas" ref={viewRef}>
                 {drawing.tiles.map((tile) => (
                     <img key={tile.key} src={tile.url} alt="" loading="lazy" draggable={false}
@@ -64,7 +64,7 @@ export function GeoPreviewMap({ geometry, bounds }) {
                 </div>
                 <div className="directory-map__attribution">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a></div>
             </div>
-            <p className="directory-map__note">Точная геометрия из файла выделена на карте. Это только предварительный просмотр черновика, не публикация.</p>
+            <p className="directory-map__note">Контур из файла выделен на карте. Это только предварительный просмотр черновика, не публикация.</p>
         </section>
     );
 }

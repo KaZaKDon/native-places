@@ -12,15 +12,15 @@ function seoSpeciesCoverExpr(): string {
 }
 function seoSpeciesPublishedList(PDO $pdo, int $limit=500): array {
     $limit=min(max(1,$limit),1000);
-    $sql = "SELECT s.slug,s.common_name,s.scientific_name,s.summary,s.updated_at,".seoSpeciesCoverExpr()." AS cover_image_id
-        FROM directory_species s WHERE s.kind='fish' AND s.status='published' AND ".seoSpeciesVisibleExpr().
+    $sql = "SELECT s.slug,s.kind,s.common_name,s.scientific_name,s.summary,s.updated_at,".seoSpeciesCoverExpr()." AS cover_image_id
+        FROM directory_species s WHERE s.kind IN ('fish','bird','mammal') AND s.status='published' AND ".seoSpeciesVisibleExpr().
         ' ORDER BY s.common_name ASC LIMIT '.$limit;
     return $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 }
 function seoSpeciesShow(PDO $pdo, string $slug): ?array {
-    $stmt=$pdo->prepare("SELECT s.id,s.slug,s.common_name,s.scientific_name,s.summary,s.body,s.updated_at,".
+    $stmt=$pdo->prepare("SELECT s.id,s.slug,s.kind,s.common_name,s.scientific_name,s.summary,s.body,s.updated_at,".
         seoSpeciesCoverExpr()." AS cover_image_id FROM directory_species s
-        WHERE s.status='published' AND s.kind='fish' AND s.slug=:slug AND ".seoSpeciesVisibleExpr().' LIMIT 1');
+        WHERE s.status='published' AND s.kind IN ('fish','bird','mammal') AND s.slug=:slug AND ".seoSpeciesVisibleExpr().' LIMIT 1');
     $stmt->execute(['slug'=>$slug]);
     $fish=$stmt->fetch(PDO::FETCH_ASSOC);
     if (!$fish) return null;
@@ -35,10 +35,11 @@ function seoSpeciesShow(PDO $pdo, string $slug): ?array {
     $fish['occurrences']=$q->fetchAll(PDO::FETCH_ASSOC);
     return $fish;
 }
-function seoSpeciesOfEntry(PDO $pdo, int $entryId): array {
-    $q=$pdo->prepare("SELECT DISTINCT s.slug,s.common_name,s.summary
+function seoSpeciesOfEntry(PDO $pdo, int $entryId, string $type = 'river'): array {
+    $kinds = in_array($type, ['river','lake'], true) ? "s.kind='fish'" : "s.kind IN ('bird','mammal')";
+    $q=$pdo->prepare("SELECT DISTINCT s.slug,s.kind,s.common_name,s.summary
         FROM directory_species_occurrences o JOIN directory_species s ON s.id=o.species_id
-        WHERE o.entry_id=:entry AND o.status='published' AND s.status='published' AND s.kind='fish'
+        WHERE o.entry_id=:entry AND o.status='published' AND s.status='published' AND $kinds
         ORDER BY s.common_name ASC LIMIT 80");
     $q->execute(['entry'=>$entryId]);
     return $q->fetchAll(PDO::FETCH_ASSOC);
@@ -59,10 +60,10 @@ function seoSpeciesSnapshot(array $fish): string {
             .' — '.seoHtmlEscape($label).': '.seoHtmlEscape($o['source_title']).'</li>';
     }
     return seoSnapshotLayout('<p><a href="/directory">Справочник мест</a></p>'
-        .'<p>Виды рыб</p><h1>'.seoHtmlEscape($fish['common_name']).'</h1>'
+        .'<p>'.seoHtmlEscape(['fish'=>'Виды рыб','bird'=>'Птицы','mammal'=>'Млекопитающие'][$fish['kind'] ?? 'fish'] ?? 'Виды животных').'</p><h1>'.seoHtmlEscape($fish['common_name']).'</h1>'
         .(!empty($fish['scientific_name'])?'<p><i>'.seoHtmlEscape($fish['scientific_name']).'</i></p>':'')
         .'<p>'.seoHtmlEscape($fish['summary']).'</p>'.$picture
         .'<h2>Описание вида</h2>'.$paragraphs
-        .'<h2>Где отмечен вид</h2><p>Данные относятся к источникам и периодам наблюдений, не гарантируют наличие рыбы сегодня.</p>'
+        .'<h2>Где отмечен вид</h2><p>Данные относятся к источникам и периодам наблюдений, не гарантируют присутствия вида сегодня и не определяют правила охоты.</p>'
         .'<ul>'.$occ.'</ul>'.seoSnapshotNavigation());
 }

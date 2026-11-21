@@ -203,7 +203,7 @@ if (preg_match('#^/directory/species/([a-z0-9-]+)$#', $path, $matches)) {
     $fishName = (string) $fish['common_name'];
     seoRenderAppShell(
         [
-            'title' => $fishName . ' (' . (string) ($fish['scientific_name'] ?: 'вид рыбы') . ') — описание | Native Places',
+            'title' => $fishName . ' (' . (string) ($fish['scientific_name'] ?: 'вид природы') . ') — описание | Native Places',
             'description' => (string) $fish['summary'],
             'canonical' => $path,
             'robots' => 'index, follow, max-image-preview:large',
@@ -235,17 +235,17 @@ if (preg_match('#^/directory/species/([a-z0-9-]+)$#', $path, $matches)) {
 
 if (preg_match('#^/directory/([a-z_]+)/([a-z0-9-]+)$#', $path, $matches)) {
     [, $type, $slug] = $matches;
-    if (!in_array($type, ['river', 'lake', 'forest', 'natural_area', 'hunting_ground', 'landmark', 'spring'], true)) {
+    if (!in_array($type, ['river', 'lake', 'forest', 'natural_area', 'hunting_ground', 'protected_area', 'landmark', 'spring'], true)) {
         seoRenderNotFound($path);
         exit;
     }
     try {
         $entry = seoDirectoryShow(seoGetDatabaseConnection(), $type, $slug);
         $fishOfEntry = [];
-        if ($entry !== null && $type === 'river') {
+        if ($entry !== null && in_array($type, ['river','lake','protected_area','hunting_ground'], true)) {
             // Broken species data must not take the already published river page offline.
             try {
-                $fishOfEntry = seoSpeciesOfEntry(seoGetDatabaseConnection(), (int) $entry['id']);
+                $fishOfEntry = seoSpeciesOfEntry(seoGetDatabaseConnection(), (int) $entry['id'], $type);
             } catch (Throwable $error) {
                 error_log('[server-seo/river-species] ' . $error->getMessage());
             }

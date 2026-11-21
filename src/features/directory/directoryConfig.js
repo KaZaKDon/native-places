@@ -5,6 +5,7 @@ export const DIRECTORY_TYPES = Object.freeze({
     forest: { label: "Лес", group: "Природные территории" },
     natural_area: { label: "Природная территория", group: "Природные территории" },
     hunting_ground: { label: "Охотничье угодье", group: "Охотничьи угодья" },
+    protected_area: { label: "Особо охраняемая природная территория", group: "Природные территории" },
     landmark: { label: "Достопримечательность", group: "Интересные места" },
     spring: { label: "Родник", group: "Интересные места" },
 });

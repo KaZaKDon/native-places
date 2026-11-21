@@ -27,3 +27,6 @@
 
 .directory-row-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
 .directory-row-actions a.directory-action { text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+.directory-territory { border: 1px solid var(--border-soft); border-radius: 14px; padding: 16px; min-width: 0; }
+.directory-territory legend { padding: 0 8px; font-weight: 700; }
+.directory-territory p { margin: 0 0 14px; }

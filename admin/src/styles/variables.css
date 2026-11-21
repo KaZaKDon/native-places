@@ -34,8 +34,14 @@
 }
 /* Geographic preview tokens, kept separate from component CSS. */
 :root {
-    --directory-map-water: #1674ca;
-    --directory-map-polygon: rgba(22, 116, 202, 0.24);
+    --directory-map-water: #258ad0;
+    --directory-map-water-fill: rgb(37 138 208 / 22%);
+    --directory-map-nature: #619c70;
+    --directory-map-nature-fill: rgb(97 156 112 / 20%);
+    --directory-map-hunting: #b68e4e;
+    --directory-map-hunting-fill: rgb(182 142 78 / 18%);
+    --directory-map-protected: #8b5cf6;
+    --directory-map-protected-fill: rgb(139 92 246 / 14%);
     --directory-map-bg: #e7edf2;
     --directory-map-attribution-bg: rgba(255, 255, 255, 0.9);
 }

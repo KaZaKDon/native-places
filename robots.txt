@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
+# Изображения опубликованных видов доступны поисковым роботам.
+Allow: /api/directory/image.php
 Disallow: /api/
 Disallow: /admin/
 

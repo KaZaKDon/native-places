@@ -3,9 +3,10 @@ import test from "node:test";
 import { DIRECTORY_TYPES, directoryEntryPath, directoryEntryTitle, directoryEntryDescription } from "./directoryConfig.js";
 
 test("directory is independent from the six paid categories", () => {
-    assert.equal(Object.keys(DIRECTORY_TYPES).length, 7);
+    assert.equal(Object.keys(DIRECTORY_TYPES).length, 8);
     assert.equal(DIRECTORY_TYPES.river.label, "Река");
     assert.equal(DIRECTORY_TYPES.hunting_ground.group, "Охотничьи угодья");
+    assert.equal(directoryEntryPath({ type: "protected_area", slug: "rostovskiy" }), "/directory/protected_area/rostovskiy");
 });
 test("public URLs and metadata are deterministic", () => {
     const entry = { type: "river", slug: "don", title: "Река Дон", summary: "Сведения о реке Дон", region: "Ростовская область" };

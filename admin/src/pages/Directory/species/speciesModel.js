@@ -26,8 +26,8 @@ export function validateSpecies(item) {
 }
 export function validateOccurrence(item) {
   const errors=[];
-  if (!Number(item.entry_id)) errors.push('Укажите реку или водоём.');
-  if (!Number(item.source_id)) errors.push('Укажите источник подтверждения рыбы.');
+  if (!Number(item.entry_id)) errors.push('Укажите природный объект.');
+  if (!Number(item.source_id)) errors.push('Укажите источник подтверждения вида.');
   if (!EVIDENCE_LEVELS.some(x=>x.value===item.evidence_level)) errors.push('Укажите уровень подтверждения.');
   if (!/^\d{4}-\d{2}-\d{2}$/.test(item.verified_at || '')) errors.push('Укажите дату проверки.');
   return errors;
